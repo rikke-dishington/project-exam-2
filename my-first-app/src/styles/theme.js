@@ -10,9 +10,12 @@ export const theme = {
     },
     text: {
       primary: '#333333',
+      light: '#FFFFFF',
+      footer: '#444444',
     },
     background: {
       primary: '#FFFFFF',
+      footer: '#F0F0F0',
     }
   },
   
@@ -23,10 +26,23 @@ export const theme = {
     },
     fontWeight: {
       medium: 500,
+      semibold: 600,
+    },
+    fontSize: {
+      small: '0.875rem',
+      medium: '1rem',
     }
   },
   
   spacing: {
+    sm: '0.5rem',
     md: '1rem',
+    lg: '2rem',
+    xl: '3rem',
+  },
+
+  layout: {
+    maxWidth: '1200px',
+    footerPadding: '2rem',
   }
 };
