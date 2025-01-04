@@ -6,13 +6,12 @@ import Header from './components/layout/header/header';
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <GlobalStyle />
-      <BrowserRouter>
+    <BrowserRouter>
+      <ThemeProvider theme={theme}>
+        <GlobalStyle />
         <Header />
-        {/* Your routes will go here later */}
-      </BrowserRouter>
-    </ThemeProvider>
+      </ThemeProvider>
+    </BrowserRouter>
   );
 }
 
