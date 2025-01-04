@@ -1,7 +1,12 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaBars, FaUserCircle, FaHeart, FaBookmark, FaUser, FaSignOutAlt } from 'react-icons/fa';
-import { useClickOutside } from '../../../hooks/useClickOutside';
+import { 
+  FiHeart, 
+  FiBookmark, 
+  FiUser, 
+  FiLogOut, 
+  FiMenu 
+} from 'react-icons/fi';
 import {
   HeaderContainer,
   Logo,
@@ -17,12 +22,23 @@ import {
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const menuRef = useRef(null);
 
-  const menuRef = useClickOutside(isMenuOpen, setIsMenuOpen);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsMenuOpen(false);
+      }
+    };
 
-  const toggleMenu = (e) => {
-    e.stopPropagation();
-    setIsMenuOpen(!isMenuOpen);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handleLogin = () => {
+    setIsLoggedIn(true);  // This should switch to the logged-in view
   };
 
   const handleLogout = () => {
@@ -30,8 +46,9 @@ function Header() {
     setIsMenuOpen(false);
   };
 
-  const handleLogin = () => {
-    setIsLoggedIn(true);
+  const toggleMenu = (e) => {
+    e.stopPropagation();
+    setIsMenuOpen(!isMenuOpen);
   };
 
   return (
@@ -44,25 +61,25 @@ function Header() {
         <MenuContainer ref={menuRef}>
           <IconGroup onClick={toggleMenu}>
             <IconWrapper>
-              <FaBars size={22} />
+              <FiMenu size={22} />
             </IconWrapper>
             <IconWrapper>
-              <FaUserCircle size={26} />
+              <FiUser size={26} />
             </IconWrapper>
           </IconGroup>
           
           <DropdownMenu isOpen={isMenuOpen}>
             <MenuItem as={Link} to="/favorites">
-              <FaHeart /> Favorites
+              <FiHeart data-icon="heart" /> Favorites
             </MenuItem>
             <MenuItem as={Link} to="/bookings">
-              <FaBookmark /> Bookings
+              <FiBookmark /> Bookings
             </MenuItem>
             <MenuItem as={Link} to="/account">
-              <FaUser /> Account
+              <FiUser /> Account
             </MenuItem>
             <MenuItem as="button" onClick={handleLogout}>
-              <FaSignOutAlt /> Logout
+              <FiLogOut /> Logout
             </MenuItem>
           </DropdownMenu>
         </MenuContainer>
