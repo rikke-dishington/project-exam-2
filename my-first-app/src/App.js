@@ -5,6 +5,7 @@ import { theme } from './styles/theme';
 import Header from './components/layout/header/header';
 import Footer from './components/layout/footer/footer';
 import Home from './pages/home/home';
+import Login from './pages/login/login'
 import Register from './pages/register/register';
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
         <Header />
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
         </Routes>
         <Footer />
