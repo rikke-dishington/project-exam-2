@@ -7,6 +7,7 @@ import Footer from './components/layout/footer/footer';
 import Home from './pages/home/home';
 import Login from './pages/login/login'
 import Register from './pages/register/register';
+import Venues from './pages/venues/venues';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/venues" element={<Venues />} />
         </Routes>
         <Footer />
       </ThemeProvider>
