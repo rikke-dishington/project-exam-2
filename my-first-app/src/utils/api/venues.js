@@ -21,3 +21,32 @@ export const getVenueById = async (id) => {
   const response = await fetch(`${API_URLS.venues}/${id}`);
   return response.json();
 };
+
+export const createVenue = async (venueData) => {
+  const response = await fetch(API_URLS.venues, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(venueData),
+  });
+  return response.json();
+};
+
+export const updateVenue = async (id, venueData) => {
+  const response = await fetch(`${API_URLS.venues}/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(venueData),
+  });
+  return response.json();
+};
+
+export const deleteVenue = async (id) => {
+  const response = await fetch(`${API_URLS.venues}/${id}`, {
+    method: 'DELETE',
+  });
+  return response.json();
+};
