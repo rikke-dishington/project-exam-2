@@ -1,4 +1,12 @@
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
+
+export const StyledLink = styled(Link)`
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  height: 100%;
+`;
 
 export const Card = styled.div`
   border-radius: 8px;
@@ -11,11 +19,11 @@ export const Card = styled.div`
   display: flex;
   flex-direction: column;
   
-  &:hover {
+  ${StyledLink}:hover & {
     transform: translateY(-2px);
   }
 
-  &:active {
+  ${StyledLink}:active & {
     transform: translateY(0);
   }
 `;
