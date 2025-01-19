@@ -1,22 +1,34 @@
+import { useState } from 'react';
+import { FiEdit2, FiTrash2 } from 'react-icons/fi';
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { FiEdit2, FiTrash2 } from 'react-icons/fi';
 import { 
-  Card, 
+  FaWifi, 
+  FaParking, 
+  FaCoffee, 
+  FaPaw,
+  FaMapMarkerAlt,
+  FaDollarSign,
+  FaUser
+} from 'react-icons/fa';
+import {
+  Card,
+  ImageContainer,
   ImageSlider,
-  ImageContainer, 
-  Image, 
-  Info, 
+  Image,
+  Info,
   TitleRow,
-  Location, 
+  Stats,
+  Location,
   Price,
-  VenueActions,
-  ActionButton,
-  Stats
+  ButtonGroup,
+  DeleteButton
 } from './VenueManagerCard.styles';
 
 function VenueManagerCard({ venue, onEdit, onDelete }) {
+  const { name, description, media, price, maxGuests, location, meta } = venue;
+
   const settings = {
     dots: true,
     infinite: true,
@@ -27,26 +39,17 @@ function VenueManagerCard({ venue, onEdit, onDelete }) {
     autoplay: false
   };
 
-  // Safely access nested properties
-  const bookingsCount = venue.bookings?.length || 0;
-  const rating = venue.rating || 0;
-  const mediaUrls = venue.media || [];
-  const price = venue.price || 0;
-  const maxGuests = venue.maxGuests || 1;
-  const city = venue.location?.city || 'Unknown City';
-  const country = venue.location?.country || 'Unknown Country';
-
   return (
     <Card>
       <ImageContainer>
-        {mediaUrls.length > 1 ? (
+        {media && media.length > 1 ? (
           <ImageSlider>
             <Slider {...settings}>
-              {mediaUrls.map((imageUrl, index) => (
+              {media.map((imageUrl, index) => (
                 <div key={index}>
                   <Image 
                     src={imageUrl || '/placeholder-image.jpg'} 
-                    alt={`${venue.name} - image ${index + 1}`}
+                    alt={`${name} - image ${index + 1}`}
                   />
                 </div>
               ))}
@@ -54,45 +57,66 @@ function VenueManagerCard({ venue, onEdit, onDelete }) {
           </ImageSlider>
         ) : (
           <Image 
-            src={mediaUrls[0] || '/placeholder-image.jpg'} 
-            alt={venue.name}
+            src={media?.[0] || '/placeholder-image.jpg'} 
+            alt={name}
           />
         )}
       </ImageContainer>
+
       <Info>
         <TitleRow>
-          <h3>{venue.name}</h3>
-          <Stats>
-            <div>
-              <span>Bookings</span>
-              <strong>{bookingsCount}</strong>
-            </div>
-            <div>
-              <span>Rating</span>
-              <strong>{rating > 0 ? rating.toFixed(1) : 'N/A'}</strong>
-            </div>
-          </Stats>
+          <h3>{name}</h3>
         </TitleRow>
-        <Location>{city}, {country}</Location>
-        <Price><span>${price}</span> per night</Price>
-        <div className="guests">Max guests: {maxGuests}</div>
-        <VenueActions>
-          <ActionButton onClick={(e) => {
-            e.preventDefault();
-            onEdit(venue);
-          }}>
+
+        <Stats>
+          <span>
+            <FaUser />
+            {maxGuests} guests
+          </span>
+          {meta?.wifi && (
+            <span>
+              <FaWifi className="fa-wifi" />
+              WiFi
+            </span>
+          )}
+          {meta?.parking && (
+            <span>
+              <FaParking className="fa-parking" />
+              Parking
+            </span>
+          )}
+          {meta?.breakfast && (
+            <span>
+              <FaCoffee className="fa-coffee" />
+              Breakfast
+            </span>
+          )}
+          {meta?.pets && (
+            <span>
+              <FaPaw className="fa-paw" />
+              Pets allowed
+            </span>
+          )}
+        </Stats>
+
+        <Location>
+          <FaMapMarkerAlt />
+          {location?.city}, {location?.country}
+        </Location>
+
+        <Price>
+          <FaDollarSign />
+          {price} <span>per night</span>
+        </Price>
+
+        <ButtonGroup>
+          <button onClick={() => onEdit(venue)}>
             <FiEdit2 /> Edit
-          </ActionButton>
-          <ActionButton 
-            className="delete" 
-            onClick={(e) => {
-              e.preventDefault();
-              onDelete(venue);
-            }}
-          >
+          </button>
+          <DeleteButton onClick={() => onDelete(venue.id)}>
             <FiTrash2 /> Delete
-          </ActionButton>
-        </VenueActions>
+          </DeleteButton>
+        </ButtonGroup>
       </Info>
     </Card>
   );

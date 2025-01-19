@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FiEdit2, FiSave, FiX, FiPlus } from 'react-icons/fi';
 import { useUser } from '../../contexts/UserContext';
-import { profileEndpoints, bookingEndpoints } from '../../utils/api';
+import { profileEndpoints, bookingEndpoints, venueEndpoints } from '../../utils/api';
 import VenueManagerCard from '../../components/venues/VenueManagerCard';
 import VenueForm from '../../components/venues/VenueForm';
 import {
@@ -27,7 +27,8 @@ import {
   BookingsContainer,
   VenuesContainer,
   AddVenueButton,
-  EmptyState
+  EmptyState,
+  HeaderContainer
 } from './account.styles';
 
 function Account() {
@@ -91,12 +92,54 @@ function Account() {
     setShowForm(true);
   };
 
-  const handleDeleteVenue = (venue) => {
-    // Implement delete logic
+  const handleDeleteVenue = async (venueId) => {
+    if (!window.confirm('Are you sure you want to delete this venue?')) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      await venueEndpoints.deleteVenue(venueId);
+      setVenues(prevVenues => prevVenues.filter(venue => venue.id !== venueId));
+      setSuccess('Venue successfully deleted');
+    } catch (err) {
+      console.error('Venue deletion error:', err);
+      setError(err.message || 'Failed to delete venue');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleSubmitVenue = (venue) => {
-    // Implement submit logic
+  const handleSubmitVenue = async (venueData) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      if (selectedVenue) {
+        // Update existing venue
+        await venueEndpoints.updateVenue(selectedVenue.id, venueData);
+        setVenues(prevVenues => 
+          prevVenues.map(venue => 
+            venue.id === selectedVenue.id ? { ...venue, ...venueData } : venue
+          )
+        );
+      } else {
+        // Create new venue
+        const newVenue = await venueEndpoints.createVenue(venueData);
+        setVenues(prevVenues => [...prevVenues, newVenue]);
+      }
+
+      setShowForm(false);
+      setSuccess('Venue successfully ' + (selectedVenue ? 'updated' : 'created'));
+      setSelectedVenue(null);
+    } catch (err) {
+      console.error('Venue submission error:', err);
+      setError(err.message || 'Failed to save venue');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleAvatarUpdate = (e) => {
@@ -144,9 +187,12 @@ function Account() {
 
     return (
       <div>
-        <AddVenueButton onClick={() => setShowForm(true)}>
-          <FiPlus /> Add New Venue
-        </AddVenueButton>
+        <HeaderContainer>
+          <h2>My Venues</h2>
+          <AddVenueButton onClick={() => setShowForm(true)}>
+            <FiPlus /> Add New Venue
+          </AddVenueButton>
+        </HeaderContainer>
         
         {!venues.length ? (
           <EmptyState>

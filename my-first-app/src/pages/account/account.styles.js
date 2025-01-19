@@ -1,5 +1,11 @@
 import styled from 'styled-components';
 
+export const Container = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+`;
+
 export const PageContainer = styled.div`
   max-width: 1200px;
   margin: 2rem auto;
@@ -7,10 +13,10 @@ export const PageContainer = styled.div`
 `;
 
 export const AccountContainer = styled.div`
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  overflow: hidden;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
 `;
 
 export const AccountHeader = styled.div`
@@ -300,7 +306,7 @@ export const BookingsContainer = styled.div`
 export const VenuesContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1rem;
+  gap: 2rem;
 
   .venue-card {
     background: white;
@@ -320,23 +326,31 @@ export const VenuesContainer = styled.div`
   }
 `;
 
+export const HeaderContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+`;
+
 export const AddVenueButton = styled.button`
   display: flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  margin-bottom: 2rem;
   border: none;
   border-radius: 8px;
   background: ${({ theme }) => theme.colors.primary.main};
   color: white;
-  font-size: 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
   &:hover {
+    background: ${({ theme }) => theme.colors.primary.dark};
     transform: translateY(-1px);
-    opacity: 0.9;
   }
 
   svg {
