@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getAllVenues } from '../../utils/api';
+import { getAllVenues } from '../../utils/api/venues';
 import VenueCard from './VenueCard';
 import { Section, Grid, Title, Subtitle } from './TopRatedVenues.styles';
 
