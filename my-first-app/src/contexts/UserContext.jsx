@@ -1,12 +1,40 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API_URLS, getHeaders } from '../utils/api/config';
 
 const UserContext = createContext();
 
 export function UserProvider({ children }) {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    // Check for existing user session on initial load
+    const token = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
+    if (token && storedUser) {
+      return JSON.parse(storedUser);
+    }
+    return null;
+  });
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  const updateUser = (userData) => {
+    if (userData) {
+      // Store both token and user data
+      localStorage.setItem('token', userData.accessToken);
+      localStorage.setItem('user', JSON.stringify(userData));
+      setUser(userData);
+    } else {
+      // Clear both token and user data
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      setUser(null);
+    }
+  };
+
+  const logout = () => {
+    updateUser(null);
+    navigate('/login');
+  };
 
   const login = async (credentials) => {
     try {
@@ -22,18 +50,11 @@ export function UserProvider({ children }) {
       
       if (!response.ok) throw new Error(data.message);
       
-      localStorage.setItem('token', data.accessToken);
-      setUser(data);
+      updateUser(data);
       navigate('/');
     } catch (error) {
       throw error;
     }
-  };
-
-  const logout = () => {
-    localStorage.removeItem('token');
-    setUser(null);
-    navigate('/login');
   };
 
   const updateAvatar = async (avatarUrl) => {
@@ -50,29 +71,39 @@ export function UserProvider({ children }) {
       
       if (!response.ok) throw new Error(data.message);
       
-      setUser(prev => ({ ...prev, avatar: avatarUrl }));
+      updateUser(prev => ({ ...prev, avatar: avatarUrl }));
       return data;
     } catch (error) {
       throw error;
     }
   };
 
+  if (isLoading) {
+    return null; // or a loading spinner
+  }
+
   const value = {
     user,
-    login,
+    updateUser,
     logout,
+    login,
     updateAvatar,
+    isAuthenticated: !!user
   };
 
-  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
+  return (
+    <UserContext.Provider value={value}>
+      {children}
+    </UserContext.Provider>
+  );
 }
 
-export const useUser = () => {
+export function useUser() {
   const context = useContext(UserContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error('useUser must be used within a UserProvider');
   }
   return context;
-};
+}
 
 export { UserContext }; 

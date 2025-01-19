@@ -6,6 +6,7 @@ export const HeaderContainer = styled.header`
   align-items: center;
   padding: 1rem 2rem;
   background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 `;
 
 export const Logo = styled.h1`
@@ -17,47 +18,72 @@ export const Logo = styled.h1`
 export const NavLinks = styled.div`
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
 `;
 
-export const NavLink = styled.a`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.7rem 1.5rem;
-  border-radius: 50px;
+export const NavLink = styled.button`
+  padding: 0.5rem 1.5rem;
+  border-radius: 4px;
   font-size: 1rem;
-  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-width: 120px;
-  text-align: center;
+  border: none;
+  background: none;
 
   ${props => props.variant === 'filled' && `
-    background-color: ${props.theme.colors.primary.main} !important;
-    color: #FFFFFF !important;
-    border: 2px solid ${props.theme.colors.primary.main} !important;
-    
+    background: ${props.theme.colors.primary.main};
+    color: white;
+
     &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      opacity: 0.9;
     }
   `}
 
   ${props => props.variant === 'outline' && `
-    background-color: transparent !important;
-    color: ${props.theme.colors.primary.main} !important;
-    border: 2px solid ${props.theme.colors.primary.main} !important;
-    
+    border: 1px solid ${props.theme.colors.primary.main};
+    color: ${props.theme.colors.primary.main};
+
     &:hover {
-      background-color: transparent !important;
-      transform: translateY(-2px);
+      background: ${props.theme.colors.primary.main}10;
     }
   `}
+`;
 
-  &:active {
-    transform: translateY(0);
-    box-shadow: none;
+export const AccountDropdown = styled.div`
+  position: relative;
+  display: inline-block;
+`;
+
+export const DropdownContent = styled.div`
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: white;
+  min-width: 160px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  padding: 0.5rem 0;
+  margin-top: 0.5rem;
+  z-index: 1000;
+  display: ${({ isOpen }) => (isOpen ? 'block' : 'none')};
+`;
+
+export const DropdownItem = styled.div`
+  color: ${({ theme }) => theme.colors.text.primary};
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.background.hover};
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+    display: block;
+    width: 100%;
   }
 `;
 
