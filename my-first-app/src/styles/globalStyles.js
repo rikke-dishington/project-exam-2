@@ -8,6 +8,16 @@ export const GlobalStyle = createGlobalStyle`
     box-sizing: border-box;
   }
 
+  html, body, #root {
+    height: 100%;
+  }
+
+  #root {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
   /* Base styles */
   body {
     font-family: ${({ theme }) => theme.typography.fontFamily.body};
@@ -15,6 +25,12 @@ export const GlobalStyle = createGlobalStyle`
     background-color: ${({ theme }) => theme.colors.background.primary};
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    padding-bottom: 60px; /* Add padding for footer height */
+  }
+
+  main {
+    flex: 1 0 auto;
+    margin-bottom: 60px; /* Match footer height */
   }
 
   /* Links */

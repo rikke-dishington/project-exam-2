@@ -4,9 +4,8 @@ export const FooterContainer = styled.footer`
   background: ${({ theme }) => theme.colors.background.footer};
   padding: ${({ theme }) => theme.spacing.lg} 0;
   text-align: center;
-  position: fixed;
-  bottom: 0;
   width: 100%;
+  margin-top: auto; /* This pushes the footer to the bottom */
 `;
 
 export const Copyright = styled.div`
