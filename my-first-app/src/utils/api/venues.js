@@ -1,4 +1,4 @@
-import { API_URLS } from './config';
+import { API_URLS, fetchWithError } from './config';
 
 export const getAllVenues = async (options = {}) => {
   const params = new URLSearchParams();
@@ -13,40 +13,29 @@ export const getAllVenues = async (options = {}) => {
   const queryString = params.toString();
   const url = `${API_URLS.venues}${queryString ? `?${queryString}` : ''}`;
   
-  const response = await fetch(url);
-  return response.json();
+  return fetchWithError(url);
 };
 
 export const getVenueById = async (id) => {
-  const response = await fetch(`${API_URLS.venues}/${id}`);
-  return response.json();
+  return fetchWithError(`${API_URLS.venues}/${id}`);
 };
 
 export const createVenue = async (venueData) => {
-  const response = await fetch(API_URLS.venues, {
+  return fetchWithError(API_URLS.venues, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(venueData),
+    body: JSON.stringify(venueData)
   });
-  return response.json();
 };
 
 export const updateVenue = async (id, venueData) => {
-  const response = await fetch(`${API_URLS.venues}/${id}`, {
+  return fetchWithError(`${API_URLS.venues}/${id}`, {
     method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(venueData),
+    body: JSON.stringify(venueData)
   });
-  return response.json();
 };
 
 export const deleteVenue = async (id) => {
-  const response = await fetch(`${API_URLS.venues}/${id}`, {
-    method: 'DELETE',
+  return fetchWithError(`${API_URLS.venues}/${id}`, {
+    method: 'DELETE'
   });
-  return response.json();
 };

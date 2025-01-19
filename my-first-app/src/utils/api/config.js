@@ -16,6 +16,16 @@ export const getHeaders = () => ({
   Authorization: `Bearer ${localStorage.getItem('token')}`,
 });
 
+export const handleResponse = async (response) => {
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({
+      message: 'An error occurred'
+    }));
+    throw new Error(error.message || 'An error occurred');
+  }
+  return response.json();
+};
+
 export class ApiError extends Error {
   constructor(message, status) {
     super(message);
