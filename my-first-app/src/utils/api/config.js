@@ -1,20 +1,22 @@
 export const API_BASE_URL = 'https://api.noroff.dev/api/v1';
 
 export const API_URLS = {
-  venues: `${API_BASE_URL}/holidaze/venues`,
-  bookings: `${API_BASE_URL}/holidaze/bookings`,
-  profiles: `${API_BASE_URL}/holidaze/profiles`,
   auth: {
     register: `${API_BASE_URL}/auth/register`,
     login: `${API_BASE_URL}/auth/login`,
-    createApiKey: `${API_BASE_URL}/auth/create-api-key`,
   },
+  venues: `${API_BASE_URL}/holidaze/venues`,
+  bookings: `${API_BASE_URL}/holidaze/bookings`,
+  profiles: `${API_BASE_URL}/holidaze/profiles`,
 };
 
-export const getHeaders = () => ({
-  'Content-Type': 'application/json',
-  Authorization: `Bearer ${localStorage.getItem('token')}`,
-});
+export const getHeaders = () => {
+  const token = localStorage.getItem('token');
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+};
 
 export const handleResponse = async (response) => {
   if (!response.ok) {
