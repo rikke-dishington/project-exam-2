@@ -1,24 +1,29 @@
 import { useState, useEffect } from 'react';
-import { FiX, FiSave, FiPlus } from 'react-icons/fi';
+import { FiX, FiPlus, FiTrash2, FiAlertCircle } from 'react-icons/fi';
 import {
   FormOverlay,
   FormContainer,
-  FormHeader,
-  FormBody,
-  FormGroup,
-  Label,
+  Form,
+  Title,
+  InputGroup,
   Input,
   TextArea,
+  ImageSection,
+  ImagePreview,
+  AddImageButton,
+  LocationGroup,
+  PriceGroup,
   ButtonGroup,
   SubmitButton,
   CancelButton,
   ErrorMessage,
-  ImagePreview,
-  ImageUpload
+  ValidationMessage,
+  FacilitiesGroup,
+  CheckboxGroup
 } from './VenueForm.styles';
 
-function VenueForm({ venue = null, onSubmit, onClose }) {
-  const initialState = {
+function VenueForm({ venue, onSubmit, onClose }) {
+  const [formData, setFormData] = useState({
     name: '',
     description: '',
     media: [],
@@ -27,38 +32,87 @@ function VenueForm({ venue = null, onSubmit, onClose }) {
     location: {
       address: '',
       city: '',
+      zip: '',
       country: '',
       continent: '',
-      zip: ''
     },
     meta: {
       wifi: false,
       parking: false,
       breakfast: false,
-      pets: false
+      pets: false,
     }
-  };
+  });
 
-  const [formData, setFormData] = useState(venue || initialState);
-  const [error, setError] = useState(null);
+  const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (venue) {
-      setFormData(venue);
+      setFormData({
+        name: venue.name || '',
+        description: venue.description || '',
+        media: venue.media || [],
+        price: venue.price || '',
+        maxGuests: venue.maxGuests || '',
+        location: {
+          address: venue.location?.address || '',
+          city: venue.location?.city || '',
+          zip: venue.location?.zip || '',
+          country: venue.location?.country || '',
+          continent: venue.location?.continent || '',
+        },
+        meta: {
+          wifi: venue.meta?.wifi || false,
+          parking: venue.meta?.parking || false,
+          breakfast: venue.meta?.breakfast || false,
+          pets: venue.meta?.pets || false,
+        }
+      });
     }
   }, [venue]);
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = 'Venue name is required';
+    }
+
+    if (!formData.description.trim()) {
+      newErrors.description = 'Description is required';
+    }
+
+    if (!formData.price || formData.price <= 0) {
+      newErrors.price = 'Valid price is required';
+    }
+
+    if (!formData.maxGuests || formData.maxGuests <= 0) {
+      newErrors.maxGuests = 'Valid number of guests is required';
+    }
+
+    if (!formData.location.city.trim()) {
+      newErrors.city = 'City is required';
+    }
+
+    if (!formData.location.country.trim()) {
+      newErrors.country = 'Country is required';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     
     if (name.includes('.')) {
-      const [parent, child] = name.split('.');
+      const [group, field] = name.split('.');
       setFormData(prev => ({
         ...prev,
-        [parent]: {
-          ...prev[parent],
-          [child]: type === 'checkbox' ? checked : value
+        [group]: {
+          ...prev[group],
+          [field]: type === 'checkbox' ? checked : value
         }
       }));
     } else {
@@ -69,101 +123,132 @@ function VenueForm({ venue = null, onSubmit, onClose }) {
     }
   };
 
-  const handleImageUpload = (e) => {
-    const files = Array.from(e.target.files);
-    const imageUrls = files.map(file => URL.createObjectURL(file));
-    
-    setFormData(prev => ({
-      ...prev,
-      media: [...prev.media, ...imageUrls]
-    }));
+  const handleImageAdd = () => {
+    const imageUrl = prompt('Enter image URL:');
+    if (imageUrl && isValidUrl(imageUrl)) {
+      setFormData(prev => ({
+        ...prev,
+        media: [...prev.media, imageUrl]
+      }));
+    }
   };
 
-  const removeImage = (index) => {
+  const handleImageRemove = (index) => {
     setFormData(prev => ({
       ...prev,
       media: prev.media.filter((_, i) => i !== index)
     }));
   };
 
+  const isValidUrl = (string) => {
+    try {
+      new URL(string);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
-    setIsLoading(true);
+    if (!validateForm()) return;
 
-    try {
-      // Validate form data
-      if (!formData.name || !formData.price || !formData.maxGuests) {
-        throw new Error('Please fill in all required fields');
+    // Prepare the data for API
+    const venueData = {
+      name: formData.name.trim(),
+      description: formData.description.trim(),
+      media: formData.media,
+      price: Number(formData.price),
+      maxGuests: Number(formData.maxGuests),
+      location: {
+        address: formData.location.address.trim(),
+        city: formData.location.city.trim(),
+        zip: formData.location.zip.trim(),
+        country: formData.location.country.trim(),
+        continent: formData.location.continent.trim(),
+      },
+      meta: {
+        wifi: Boolean(formData.meta.wifi),
+        parking: Boolean(formData.meta.parking),
+        breakfast: Boolean(formData.meta.breakfast),
+        pets: Boolean(formData.meta.pets),
       }
+    };
 
-      await onSubmit(formData);
+    setIsLoading(true);
+    try {
+      await onSubmit(venueData);
       onClose();
-    } catch (err) {
-      setError(err.message);
+    } catch (error) {
+      setErrors(prev => ({
+        ...prev,
+        submit: error.message
+      }));
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <FormOverlay>
+    <FormOverlay onClick={(e) => e.target === e.currentTarget && onClose()}>
       <FormContainer>
-        <FormHeader>
-          <h2>{venue ? 'Edit Venue' : 'Add New Venue'}</h2>
-          <button onClick={onClose}><FiX /></button>
-        </FormHeader>
-
-        {error && <ErrorMessage>{error}</ErrorMessage>}
-
-        <FormBody onSubmit={handleSubmit}>
-          <FormGroup>
-            <Label>Venue Name *</Label>
+        <Title>{venue ? 'Edit Venue' : 'Create New Venue'}</Title>
+        {errors.submit && <ErrorMessage>{errors.submit}</ErrorMessage>}
+        
+        <Form onSubmit={handleSubmit}>
+          <InputGroup>
+            <h3>Name</h3>
             <Input
               type="text"
               name="name"
+              placeholder="Venue Name"
               value={formData.name}
               onChange={handleChange}
-              required
+              error={errors.name}
             />
-          </FormGroup>
+            {errors.name && (
+              <ValidationMessage>
+                <FiAlertCircle /> {errors.name}
+              </ValidationMessage>
+            )}
+          </InputGroup>
 
-          <FormGroup>
-            <Label>Description</Label>
+          <InputGroup>
+            <h3>Description</h3>
             <TextArea
               name="description"
+              placeholder="Description"
               value={formData.description}
               onChange={handleChange}
-              rows={4}
+              error={errors.description}
             />
-          </FormGroup>
+            {errors.description && (
+              <ValidationMessage>
+                <FiAlertCircle /> {errors.description}
+              </ValidationMessage>
+            )}
+          </InputGroup>
 
-          <FormGroup>
-            <Label>Price per night *</Label>
-            <Input
-              type="number"
-              name="price"
-              value={formData.price}
-              onChange={handleChange}
-              min="0"
-              required
-            />
-          </FormGroup>
+          <ImageSection>
+            <h3>Images</h3>
+            <div className="image-grid">
+              {formData.media.map((url, index) => (
+                <ImagePreview key={index}>
+                  <img src={url} alt={`Venue ${index + 1}`} />
+                  <button type="button" onClick={() => handleImageRemove(index)}>
+                    <FiTrash2 />
+                  </button>
+                </ImagePreview>
+              ))}
+              <AddImageButton type="button" onClick={handleImageAdd}>
+                <FiPlus />
+                Add Image
+              </AddImageButton>
+            </div>
+          </ImageSection>
 
-          <FormGroup>
-            <Label>Max Guests *</Label>
-            <Input
-              type="number"
-              name="maxGuests"
-              value={formData.maxGuests}
-              onChange={handleChange}
-              min="1"
-              required
-            />
-          </FormGroup>
-
-          <FormGroup>
-            <Label>Location</Label>
+          <LocationGroup>
+            <h3>Location</h3>
             <Input
               type="text"
               name="location.address"
@@ -177,94 +262,127 @@ function VenueForm({ venue = null, onSubmit, onClose }) {
               placeholder="City"
               value={formData.location.city}
               onChange={handleChange}
+              error={errors.city}
             />
+            {errors.city && (
+              <ValidationMessage>
+                <FiAlertCircle /> {errors.city}
+              </ValidationMessage>
+            )}
             <Input
               type="text"
               name="location.country"
               placeholder="Country"
               value={formData.location.country}
               onChange={handleChange}
+              error={errors.country}
             />
-          </FormGroup>
+            {errors.country && (
+              <ValidationMessage>
+                <FiAlertCircle /> {errors.country}
+              </ValidationMessage>
+            )}
+          </LocationGroup>
 
-          <FormGroup>
-            <Label>Amenities</Label>
-            <div className="checkbox-group">
-              <label>
-                <input
-                  type="checkbox"
-                  name="meta.wifi"
-                  checked={formData.meta.wifi}
-                  onChange={handleChange}
-                />
-                WiFi
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  name="meta.parking"
-                  checked={formData.meta.parking}
-                  onChange={handleChange}
-                />
-                Parking
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  name="meta.breakfast"
-                  checked={formData.meta.breakfast}
-                  onChange={handleChange}
-                />
-                Breakfast
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  name="meta.pets"
-                  checked={formData.meta.pets}
-                  onChange={handleChange}
-                />
-                Pets Allowed
-              </label>
-            </div>
-          </FormGroup>
-
-          <FormGroup>
-            <Label>Images</Label>
-            <ImageUpload>
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleImageUpload}
-                id="venue-images"
-                hidden
+          <PriceGroup>
+            <InputGroup>
+              <h3>Price</h3>
+              <Input
+                type="number"
+                name="price"
+                placeholder="Price per night"
+                value={formData.price}
+                onChange={handleChange}
+                min="0"
+                error={errors.price}
               />
-              <label htmlFor="venue-images">
-                <FiPlus /> Add Images
-              </label>
-            </ImageUpload>
-            <div className="image-previews">
-              {formData.media.map((url, index) => (
-                <ImagePreview key={index}>
-                  <img src={url} alt={`Venue preview ${index + 1}`} />
-                  <button type="button" onClick={() => removeImage(index)}>
-                    <FiX />
-                  </button>
-                </ImagePreview>
-              ))}
+              {errors.price && (
+                <ValidationMessage>
+                  <FiAlertCircle /> {errors.price}
+                </ValidationMessage>
+              )}
+            </InputGroup>
+            <InputGroup>
+              <h3>Guests</h3>
+              <Input
+                type="number"
+                name="maxGuests"
+                placeholder="Maximum guests"
+                value={formData.maxGuests}
+                onChange={handleChange}
+                min="1"
+                error={errors.maxGuests}
+              />
+              {errors.maxGuests && (
+                <ValidationMessage>
+                  <FiAlertCircle /> {errors.maxGuests}
+                </ValidationMessage>
+              )}
+            </InputGroup>
+          </PriceGroup>
+
+          <FacilitiesGroup>
+            <h3>Facilities</h3>
+            <div className="facilities-grid">
+              <CheckboxGroup>
+                <label>
+                  <input
+                    type="checkbox"
+                    name="meta.wifi"
+                    checked={formData.meta.wifi}
+                    onChange={handleChange}
+                  />
+                  WiFi
+                </label>
+              </CheckboxGroup>
+
+              <CheckboxGroup>
+                <label>
+                  <input
+                    type="checkbox"
+                    name="meta.parking"
+                    checked={formData.meta.parking}
+                    onChange={handleChange}
+                  />
+                  Parking
+                </label>
+              </CheckboxGroup>
+
+              <CheckboxGroup>
+                <label>
+                  <input
+                    type="checkbox"
+                    name="meta.breakfast"
+                    checked={formData.meta.breakfast}
+                    onChange={handleChange}
+                  />
+                  Breakfast
+                </label>
+              </CheckboxGroup>
+
+              <CheckboxGroup>
+                <label>
+                  <input
+                    type="checkbox"
+                    name="meta.pets"
+                    checked={formData.meta.pets}
+                    onChange={handleChange}
+                  />
+                  Pets Allowed
+                </label>
+              </CheckboxGroup>
             </div>
-          </FormGroup>
+          </FacilitiesGroup>
 
           <ButtonGroup>
             <SubmitButton type="submit" disabled={isLoading}>
-              <FiSave /> {isLoading ? 'Saving...' : 'Save Venue'}
+              {isLoading ? 'Saving...' : venue ? 'Save Changes' : 'Create Venue'}
             </SubmitButton>
             <CancelButton type="button" onClick={onClose}>
               <FiX /> Cancel
             </CancelButton>
           </ButtonGroup>
-        </FormBody>
+        </Form>
       </FormContainer>
     </FormOverlay>
   );

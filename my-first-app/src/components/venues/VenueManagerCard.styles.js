@@ -11,7 +11,23 @@ export const Card = styled.div`
   flex-direction: column;
 `;
 
+export const ImageContainer = styled.div`
+  position: relative;
+  width: 100%;
+  height: 200px;
+`;
+
 export const ImageSlider = styled.div`
+  height: 100%;
+
+  .slick-slider, .slick-list, .slick-track {
+    height: 100%;
+  }
+
+  .slick-slide > div {
+    height: 100%;
+  }
+
   .slick-dots {
     bottom: 10px;
     
@@ -41,10 +57,6 @@ export const ImageSlider = styled.div`
   }
 `;
 
-export const ImageContainer = styled.div`
-  position: relative;
-`;
-
 export const Image = styled.img`
   width: 100%;
   height: 200px;
@@ -67,68 +79,98 @@ export const TitleRow = styled.div`
   h3 {
     margin: 0;
     color: ${({ theme }) => theme.colors.text.primary};
+    font-size: 1.25rem;
   }
 `;
 
 export const Stats = styled.div`
   display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
-  
-  div {
-    text-align: right;
-    
-    span {
-      display: block;
-      font-size: 0.8rem;
-      color: ${({ theme }) => theme.colors.text.footer};
-    }
-    
-    strong {
-      color: ${({ theme }) => theme.colors.text.primary};
+  margin: 1rem 0;
+
+  span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: ${({ theme }) => theme.colors.text.primary};
+
+    svg {
+      font-size: 1.2rem;
+
+      &.fa-wifi {
+        color: ${({ theme }) => theme.colors.primary};
+      }
+      &.fa-parking {
+        color: ${({ theme }) => theme.colors.primary};
+      }
+      &.fa-coffee {
+        color: #8B4513;
+      }
+      &.fa-paw {
+        color: #FF8C00;
+      }
     }
   }
 `;
 
-export const Location = styled.p`
+export const Location = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   color: ${({ theme }) => theme.colors.text.footer};
   font-size: 0.9rem;
   margin-bottom: 1rem;
 `;
 
 export const Price = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   color: ${({ theme }) => theme.colors.text.primary};
   margin-top: auto;
   padding-top: 1rem;
   
   span {
-    font-weight: bold;
+    color: ${({ theme }) => theme.colors.text.secondary};
+    font-size: 0.9rem;
   }
 `;
 
-export const VenueActions = styled.div`
+export const ButtonGroup = styled.div`
   display: flex;
-  gap: 0.5rem;
+  gap: 1rem;
   margin-top: 1rem;
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid ${({ theme }) => theme.colors.border};
+    border-radius: 4px;
+    background: white;
+    color: ${({ theme }) => theme.colors.text.primary};
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: ${({ theme }) => theme.colors.background.hover};
+    }
+
+    svg {
+      font-size: 1rem;
+    }
+  }
 `;
 
-export const ActionButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  background: ${({ theme }) => theme.colors.primary.main};
-  color: white;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
+export const DeleteButton = styled.button`
+  background: #dc3545 !important;
+  color: white !important;
+  border: none !important;
 
   &:hover {
-    opacity: 0.9;
-  }
-
-  &.delete {
-    background: ${({ theme }) => theme.colors.error};
+    background: #c82333 !important;
   }
 `; 

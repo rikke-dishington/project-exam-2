@@ -111,6 +111,7 @@ export const venueEndpoints = {
       const data = await response.json();
       throw new Error(data.message || 'Failed to delete venue');
     }
+    return true;
   }
 };
 
