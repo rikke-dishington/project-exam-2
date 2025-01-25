@@ -1,36 +1,80 @@
 import styled from 'styled-components';
 
 export const VenueContainer = styled.main`
-  margin: 0 100px;
-  padding: 1rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 1rem;
+`;
 
-  @media (max-width: 768px) {
-    margin: 0 20px;
-    padding: 0.5rem;
+export const ImageSection = styled.section`
+  width: 100%;
+  margin-bottom: 2rem;
+`;
+
+export const ImageWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  overflow: hidden;
+`;
+
+export const VenueImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
+
+export const ImageButton = styled.button`
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  ${({ direction }) => direction === 'left' ? 'left: 1rem;' : 'right: 1rem;'}
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: white;
+    transform: translateY(-50%) scale(1.1);
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+    color: ${({ theme }) => theme.colors.text.primary};
   }
 `;
 
-export const VenueHeader = styled.div`
+export const ImageDots = styled.div`
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
-  flex-direction: column;
   gap: 0.5rem;
 `;
 
-export const VenueTitle = styled.h1`
-  font-size: 2rem;
-  color: ${({ theme }) => theme.colors.text.primary};
-  margin: 0;
-`;
+export const ImageDot = styled.button`
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  background: ${({ active }) => 
+    active ? 'white' : 'rgba(255, 255, 255, 0.5)'};
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s ease;
 
-export const VenueRating = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 1.1rem;
-  
-  svg {
-    color: #FFD700;
-    font-size: 1.2rem;
+  &:hover {
+    background: white;
   }
 `;
 
@@ -42,14 +86,13 @@ export const ContentWrapper = styled.div`
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
-    gap: 1rem;
   }
 `;
 
 export const LeftColumn = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 4rem;
+  gap: 2rem;
 `;
 
 export const RightColumn = styled.div`
@@ -58,137 +101,92 @@ export const RightColumn = styled.div`
   height: fit-content;
 `;
 
+export const VenueHeader = styled.header`
+  margin-bottom: 2rem;
+`;
+
+export const VenueTitle = styled.h1`
+  font-size: 2rem;
+  color: ${({ theme }) => theme.colors.text.primary};
+  margin: 0 0 1rem 0;
+`;
+
+export const VenueSubHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  color: ${({ theme }) => theme.colors.text.secondary};
+`;
+
 export const VenueLocation = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: ${({ theme }) => theme.colors.text.secondary};
-  font-size: 1rem;
-  margin-bottom: 2rem;
 
   svg {
-    font-size: 1.2rem;
-  }
-`;
-
-export const VenueDescription = styled.div`
-  margin-bottom: 2rem;
-
-  h2 {
-    font-size: 1.5rem;
-    color: ${({ theme }) => theme.colors.text.primary};
-    margin-bottom: 1rem;
-  }
-
-  p {
     color: ${({ theme }) => theme.colors.text.secondary};
-    line-height: 1.6;
   }
 `;
 
-export const FacilitiesSection = styled.div`
-  h2 {
-    font-size: 1.5rem;
-    color: ${({ theme }) => theme.colors.text.primary};
-    margin-bottom: 1rem;
+export const VenueRating = styled.span`
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+
+  svg {
+    color: #fbbf24;
   }
+`;
+
+export const VenueDescription = styled.p`
+  color: ${({ theme }) => theme.colors.text.primary};
+  line-height: 1.6;
+  margin: 0;
+`;
+
+export const Section = styled.section`
+  margin-bottom: 2rem;
+`;
+
+export const SectionTitle = styled.h2`
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text.primary};
+  margin: 0 0 1rem 0;
 `;
 
 export const FacilitiesList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  margin-top: 1rem;
+  gap: 1rem;
 `;
 
 export const FacilityItem = styled.div`
   display: flex;
   align-items: center;
   gap: 1rem;
-  font-size: 1.1rem;
+  padding: 0.5rem;
   color: ${({ theme }) => theme.colors.text.primary};
 `;
 
 export const FacilityIcon = styled.span`
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
   
   svg {
     font-size: 1.2rem;
-    color: ${({ hasFeature }) => hasFeature ? '#22c55e' : '#ef4444'};
+    color: ${({ available }) => 
+      available ? '#22c55e' : '#ef4444'};
   }
 `;
 
-export const BookingSection = styled.div`
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-`;
-
-export const PriceInfo = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 1rem 0 2rem 0;
-  font-size: 1rem;
-  
-  span:first-child {
-    font-weight: 500;
-  }
-`;
-
-export const MaxGuests = styled.span`
-  color: ${({ theme }) => theme.colors.text.secondary};
-`;
-
-export const BookingForm = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-
-  button {
-    width: 100%;
-    padding: 1rem;
-    border-radius: 8px;
-    border: 1px solid ${({ theme }) => theme.colors.border};
-    background: white;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: all 0.2s ease;
-
-    &:hover {
-      background: ${({ theme }) => theme.colors.background.light};
-    }
-  }
-
-  .book-button {
-    background: #0073E6;
-    color: white;
-    border: none;
-
-    &:hover {
-      background: #0066CC;
-    }
-
-    &:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-    }
-  }
-`;
-
-export const TotalPrice = styled.div`
-  margin: 1rem 0;
-  padding: 1rem;
-  background: ${({ theme }) => theme.colors.background.light};
-  border-radius: 4px;
-  font-weight: 500;
+export const AddressInfo = styled.div`
   color: ${({ theme }) => theme.colors.text.primary};
-  text-align: center;
+  line-height: 1.6;
+
+  p {
+    margin: 0.25rem 0;
+  }
 `;
 
 export const LoadingSpinner = styled.div`
@@ -201,26 +199,4 @@ export const ErrorMessage = styled.div`
   text-align: center;
   padding: 2rem;
   color: ${({ theme }) => theme.colors.error};
-`;
-
-export const AddressContent = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 1rem;
-  color: ${({ theme }) => theme.colors.text.primary};
-
-  svg {
-    font-size: 1.2rem;
-  }
-
-  span {
-    font-size: 1rem;
-    line-height: 1.5;
-    
-    &:not(:last-child)::after {
-      content: ',';
-      margin-right: 0.3rem;
-    }
-  }
 `;
