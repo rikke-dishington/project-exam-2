@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { FiEdit2, FiSave, FiX, FiPlus } from 'react-icons/fi';
+import { FiPlus } from 'react-icons/fi';
 import { useUser } from '../../contexts/UserContext';
-import { profileEndpoints, bookingEndpoints, venueEndpoints } from '../../utils/api';
+import { getProfile, getProfileVenues, getProfileBookings } from '../../utils/api/profiles';
+import { updateVenue, createVenue, deleteVenue } from '../../utils/api/venues';
+import AccountManagement from '../../components/account/AccountManagement';
 import VenueManagerCard from '../../components/venues/VenueManagerCard';
 import VenueForm from '../../components/venues/VenueForm';
 import {
@@ -10,22 +12,10 @@ import {
   TabContainer,
   Tab,
   AccountContent,
-  ProfileSection,
-  AvatarSection,
-  Avatar,
-  AvatarUpload,
-  UserInfo,
-  UserInfoHeader,
-  EditButton,
-  EditableField,
-  ButtonGroup,
-  SaveButton,
-  CancelButton,
-  Bio,
   ErrorMessage,
   SuccessMessage,
-  BookingsContainer,
   VenuesContainer,
+  BookingsContainer,
   AddVenueButton,
   EmptyState,
   HeaderContainer
@@ -42,49 +32,47 @@ function Account() {
   const [success, setSuccess] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [selectedVenue, setSelectedVenue] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedProfile, setEditedProfile] = useState(null);
+
+  const fetchUserData = async () => {
+    if (!user?.name) return;
+
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const profileData = await getProfile(user.name);
+      setProfile(profileData);
+
+      if (activeTab === 'venues') {
+        const venuesData = await getProfileVenues(user.name);
+        setVenues(venuesData);
+      }
+
+      if (activeTab === 'bookings') {
+        const bookingsData = await getProfileBookings(user.name);
+        setBookings(bookingsData);
+      }
+
+    } catch (err) {
+      console.error('Error fetching user data:', err);
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      if (!user?.name) return;
-
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        // Fetch profile data
-        const profileData = await profileEndpoints.getProfile(user.name);
-        console.log('Profile data:', profileData);
-        setProfile(profileData);
-
-        // Fetch user's bookings
-        if (activeTab === 'bookings') {
-          const bookingsData = await bookingEndpoints.getMyBookings();
-          console.log('Bookings data:', bookingsData);
-          setBookings(Array.isArray(bookingsData) ? bookingsData : []);
-        }
-
-        // Fetch user's venues
-        if (activeTab === 'venues') {
-          const venuesData = await profileEndpoints.getProfileVenues(user.name);
-          console.log('Venues data:', venuesData);
-          setVenues(Array.isArray(venuesData) ? venuesData : []);
-        }
-
-      } catch (err) {
-        console.error('Error fetching user data:', err);
-        setError(err.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchUserData();
   }, [user?.name, activeTab]);
 
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
+  const handleProfileUpdate = async (updatedProfile) => {
+    try {
+      setSuccess('Profile updated successfully!');
+      await fetchUserData();
+    } catch (err) {
+      console.error('Profile update error:', err);
+      setError(err.message);
+    }
   };
 
   const handleEditVenue = (venue) => {
@@ -101,7 +89,7 @@ function Account() {
       setIsLoading(true);
       setError(null);
       
-      await venueEndpoints.deleteVenue(venueId);
+      await deleteVenue(venueId);
       setVenues(prevVenues => prevVenues.filter(venue => venue.id !== venueId));
       setSuccess('Venue successfully deleted');
     } catch (err) {
@@ -118,16 +106,15 @@ function Account() {
       setError(null);
 
       if (selectedVenue) {
-        // Update existing venue
-        await venueEndpoints.updateVenue(selectedVenue.id, venueData);
+        await updateVenue(selectedVenue.id, venueData);
         setVenues(prevVenues => 
           prevVenues.map(venue => 
             venue.id === selectedVenue.id ? { ...venue, ...venueData } : venue
           )
         );
       } else {
-        // Create new venue
-        const newVenue = await venueEndpoints.createVenue(venueData);
+      
+        const newVenue = await createVenue(venueData);
         setVenues(prevVenues => [...prevVenues, newVenue]);
       }
 
@@ -142,14 +129,6 @@ function Account() {
     }
   };
 
-  const handleAvatarUpdate = (e) => {
-    // Implement avatar update logic
-  };
-
-  const handleSaveProfile = () => {
-    // Implement save profile logic
-  };
-
   const renderBookings = () => {
     if (isLoading) return <div>Loading bookings...</div>;
     if (error) return <ErrorMessage>{error}</ErrorMessage>;
@@ -158,7 +137,6 @@ function Account() {
     return (
       <BookingsContainer>
         {bookings.map(booking => {
-          // Ensure booking and venue exist before rendering
           if (!booking) return null;
           
           return (
@@ -224,6 +202,7 @@ function Account() {
   };
 
   if (!user) return <div>Please log in to view your account</div>;
+  if (isLoading && !profile) return <div>Loading...</div>;
 
   return (
     <PageContainer>
@@ -231,20 +210,20 @@ function Account() {
         <TabContainer>
           <Tab 
             active={activeTab === 'profile'} 
-            onClick={() => handleTabChange('profile')}
+            onClick={() => setActiveTab('profile')}
           >
             Profile
           </Tab>
           <Tab 
             active={activeTab === 'bookings'} 
-            onClick={() => handleTabChange('bookings')}
+            onClick={() => setActiveTab('bookings')}
           >
             My Bookings
           </Tab>
           {profile?.venueManager && (
             <Tab 
               active={activeTab === 'venues'} 
-              onClick={() => handleTabChange('venues')}
+              onClick={() => setActiveTab('venues')}
             >
               My Venues
             </Tab>
@@ -256,102 +235,14 @@ function Account() {
           {success && <SuccessMessage>{success}</SuccessMessage>}
           
           {activeTab === 'profile' && profile && (
-            <ProfileSection>
-              <AvatarSection>
-                <Avatar 
-                  src={profile.avatar || '/default-avatar.png'} 
-                  alt="Profile avatar" 
-                />
-                <AvatarUpload>
-                  <input
-                    type="file"
-                    accept="image/jpeg,image/png,image/gif"
-                    onChange={handleAvatarUpdate}
-                    id="avatar-upload"
-                    hidden
-                  />
-                  <label htmlFor="avatar-upload">
-                    <FiEdit2 /> Update Avatar
-                  </label>
-                </AvatarUpload>
-              </AvatarSection>
-              <UserInfo>
-                {isEditing ? (
-                  <>
-                    <EditableField>
-                      <input
-                        type="text"
-                        value={editedProfile.name}
-                        onChange={(e) => setEditedProfile(prev => ({
-                          ...prev,
-                          name: e.target.value
-                        }))}
-                        placeholder="Your name"
-                        disabled
-                      />
-                    </EditableField>
-                    <p>{profile.email}</p>
-                    <EditableField>
-                      <textarea
-                        value={editedProfile.bio || ''}
-                        onChange={(e) => setEditedProfile(prev => ({
-                          ...prev,
-                          bio: e.target.value
-                        }))}
-                        placeholder="Tell us about yourself..."
-                      />
-                    </EditableField>
-                    <EditableField>
-                      <label>
-                        <input
-                          type="checkbox"
-                          checked={editedProfile.venueManager}
-                          onChange={(e) => setEditedProfile(prev => ({
-                            ...prev,
-                            venueManager: e.target.checked
-                          }))}
-                        />
-                        I want to be a venue manager
-                      </label>
-                    </EditableField>
-                    <ButtonGroup>
-                      <SaveButton onClick={handleSaveProfile}>
-                        <FiSave /> Save Changes
-                      </SaveButton>
-                      <CancelButton onClick={() => {
-                        setIsEditing(false);
-                        setEditedProfile(profile);
-                      }}>
-                        <FiX /> Cancel
-                      </CancelButton>
-                    </ButtonGroup>
-                  </>
-                ) : (
-                  <>
-                    <UserInfoHeader>
-                      <div>
-                        <h2>{profile.name}</h2>
-                        <p>{profile.email}</p>
-                      </div>
-                      <EditButton onClick={() => {
-                        setIsEditing(true);
-                        setEditedProfile({ ...profile });
-                      }}>
-                        <FiEdit2 /> Edit Profile
-                      </EditButton>
-                    </UserInfoHeader>
-                    {profile.bio && <Bio>{profile.bio}</Bio>}
-                    {profile.venueManager && (
-                      <span className="badge">Venue Manager</span>
-                    )}
-                  </>
-                )}
-              </UserInfo>
-            </ProfileSection>
+            <AccountManagement 
+              profile={profile} 
+              onProfileUpdate={handleProfileUpdate}
+            />
           )}
 
           {activeTab === 'bookings' && renderBookings()}
-          {activeTab === 'venues' && renderVenues()}
+          {activeTab === 'venues' && profile?.venueManager && renderVenues()}
         </AccountContent>
       </AccountContainer>
     </PageContainer>

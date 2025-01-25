@@ -1,38 +1,48 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API_URLS, getHeaders } from '../utils/api/config';
 
 const UserContext = createContext();
 
+export const useUser = () => {
+  const context = useContext(UserContext);
+  if (!context) {
+    throw new Error('useUser must be used within a UserProvider');
+  }
+  return context;
+};
+
 export function UserProvider({ children }) {
   const [user, setUser] = useState(() => {
-    // Check for existing user session on initial load
-    const token = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
-    if (token && storedUser) {
-      return JSON.parse(storedUser);
+    try {
+      const savedUser = localStorage.getItem('user');
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch (error) {
+      console.error('Error parsing user from localStorage:', error);
+      localStorage.removeItem('user');
+      return null;
     }
-    return null;
   });
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const updateUser = (userData) => {
-    if (userData) {
-      // Store both token and user data
-      localStorage.setItem('token', userData.accessToken);
-      localStorage.setItem('user', JSON.stringify(userData));
-      setUser(userData);
-    } else {
-      // Clear both token and user data
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      setUser(null);
+  const updateUser = (newUser) => {
+    try {
+      if (newUser) {
+        localStorage.setItem('user', JSON.stringify(newUser));
+      } else {
+        localStorage.removeItem('user');
+      }
+      setUser(newUser);
+    } catch (error) {
+      console.error('Error updating user:', error);
     }
   };
 
   const logout = () => {
-    updateUser(null);
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    setUser(null);
     navigate('/login');
   };
 
@@ -57,27 +67,6 @@ export function UserProvider({ children }) {
     }
   };
 
-  const updateAvatar = async (avatarUrl) => {
-    try {
-      if (!user) return;
-      
-      const response = await fetch(`${API_URLS.profiles}/${user.name}/media`, {
-        method: 'PUT',
-        headers: getHeaders(),
-        body: JSON.stringify({ avatar: avatarUrl }),
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) throw new Error(data.message);
-      
-      updateUser(prev => ({ ...prev, avatar: avatarUrl }));
-      return data;
-    } catch (error) {
-      throw error;
-    }
-  };
-
   if (isLoading) {
     return null; // or a loading spinner
   }
@@ -87,7 +76,6 @@ export function UserProvider({ children }) {
     updateUser,
     logout,
     login,
-    updateAvatar,
     isAuthenticated: !!user
   };
 
@@ -96,14 +84,6 @@ export function UserProvider({ children }) {
       {children}
     </UserContext.Provider>
   );
-}
-
-export function useUser() {
-  const context = useContext(UserContext);
-  if (context === undefined) {
-    throw new Error('useUser must be used within a UserProvider');
-  }
-  return context;
 }
 
 export { UserContext }; 
