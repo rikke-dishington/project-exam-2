@@ -10,20 +10,6 @@ export const VenueContainer = styled.main`
   }
 `;
 
-export const ImageContainer = styled.div`
-  width: 100%;
-  height: 400px;
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 1rem;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-`;
-
 export const VenueHeader = styled.div`
   display: flex;
   flex-direction: column;

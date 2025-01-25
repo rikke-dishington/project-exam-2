@@ -13,7 +13,6 @@ import {
 import { getVenueById } from '../../utils/api/venues';
 import {
   VenueContainer,
-  ImageContainer,
   ContentWrapper,
   LeftColumn,
   RightColumn,
@@ -29,7 +28,6 @@ import {
   BookingSection,
   BookingForm,
   PriceInfo,
-  TotalPrice,
   LoadingSpinner,
   ErrorMessage,
   MaxGuests,
