@@ -1,84 +1,58 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import Slider from 'react-slick';
 import { 
-  FaWifi, 
-  FaParking, 
-  FaCoffee, 
-  FaPaw,
-  FaRegHeart,
   FaMapMarkerAlt,
+  FaStar,
   FaCheck,
   FaTimes,
-  FaStar
+  FaChevronLeft,
+  FaChevronRight
 } from 'react-icons/fa';
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 import { getVenueById } from '../../utils/api/venues';
+import useBookingStore from '../../stores/bookingStore';
+import BookingForm from '../../components/bookings/BookingForm';
+import BookingSummaryModal from '../../components/bookings/BookingSummaryModal';
 import {
   VenueContainer,
+  ImageSection,
+  ImageWrapper,
+  VenueImage,
+  ImageButton,
+  ImageDots,
+  ImageDot,
+  ContentWrapper,
+  LeftColumn,
+  RightColumn,
   VenueHeader,
   VenueTitle,
+  VenueSubHeader,
+  VenueRating,
   VenueLocation,
-  ImageGallery,
-  VenueImage,
-  VenueInfo,
   VenueDescription,
-  VenueDetails,
-  DetailItem,
-  DetailLabel,
-  DetailValue,
-  BookingSection,
-  BookingSectionHeader,
-  PriceRow,
-  BookingForm,
-  DateInputGroup,
-  GuestInputGroup,
-  BookButton,
-  BookingNote,
-  VenueSubInfo,
-  FacilitiesSection,
+  Section,
+  SectionTitle,
   FacilitiesList,
   FacilityItem,
-  ImageContainer,
-  HeartButton,
-  LocationSection,
-  LocationDetails,
-  DescriptionSection
+  FacilityIcon,
+  LoadingSpinner,
+  ErrorMessage,
+  AddressInfo
 } from './venue.styles';
-import { useTheme } from 'styled-components';
 
 function Venue() {
   const { id } = useParams();
   const [venue, setVenue] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [checkIn, setCheckIn] = useState('');
-  const [checkOut, setCheckOut] = useState('');
-  const [guests, setGuests] = useState(1);
-  const [isFavorite, setIsFavorite] = useState(false);
-  const theme = useTheme();
-
-  const today = new Date().toISOString().split('T')[0];
-
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    arrows: true,
-    autoplay: false,
-    adaptiveHeight: true,
-    fade: true,
-    cssEase: 'linear'
-  };
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const { clearBooking } = useBookingStore();
 
   useEffect(() => {
     const fetchVenue = async () => {
       try {
+        setIsLoading(true);
+        setError(null);
         const data = await getVenueById(id);
-        console.log('Venue data:', data);
         setVenue(data);
       } catch (err) {
         setError(err.message);
@@ -88,175 +62,118 @@ function Venue() {
     };
 
     fetchVenue();
-  }, [id]);
+    return () => clearBooking();
+  }, [id, clearBooking]);
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-  if (!venue) return <div>Venue not found</div>;
+  if (isLoading) return <LoadingSpinner>Loading...</LoadingSpinner>;
+  if (error) return <ErrorMessage>{error}</ErrorMessage>;
+  if (!venue) return <ErrorMessage>Venue not found</ErrorMessage>;
 
-  const handleBooking = (e) => {
-    e.preventDefault();
-    console.log('Booking details:', { checkIn, checkOut, guests });
+  const facilities = [
+    { name: 'WiFi', available: venue.meta.wifi },
+    { name: 'Parking', available: venue.meta.parking },
+    { name: 'Breakfast', available: venue.meta.breakfast },
+    { name: 'Pets allowed', available: venue.meta.pets }
+  ];
+
+  const images = venue.media && venue.media.length > 0
+    ? venue.media.map(url => ({ url }))
+    : [{ url: 'https://placehold.co/600x400?text=No+Image+Available' }];
+
+  const handlePrevious = () => {
+    setCurrentImageIndex((prev) => 
+      prev === 0 ? images.length - 1 : prev - 1
+    );
+  };
+
+  const handleNext = () => {
+    setCurrentImageIndex((prev) => 
+      prev === images.length - 1 ? 0 : prev + 1
+    );
   };
 
   return (
     <VenueContainer>
-      <ImageContainer>
-        <HeartButton onClick={() => setIsFavorite(!isFavorite)}>
-          <FaRegHeart />
-        </HeartButton>
-        <ImageGallery>
-          {venue.media && venue.media.length > 0 ? (
-            <Slider {...settings}>
-              {venue.media.map((imageUrl, index) => (
-                <div key={index}>
-                  <VenueImage 
-                    src={imageUrl || '/placeholder-image.jpg'} 
-                    alt={`${venue.name} - image ${index + 1}`}
+      <ImageSection>
+        <ImageWrapper>
+          <VenueImage 
+            src={images[currentImageIndex].url} 
+            alt={`Venue image ${currentImageIndex + 1}`}
+          />
+          {images.length > 1 && (
+            <>
+              <ImageButton direction="left" onClick={handlePrevious}>
+                <FaChevronLeft />
+              </ImageButton>
+              <ImageButton direction="right" onClick={handleNext}>
+                <FaChevronRight />
+              </ImageButton>
+              <ImageDots>
+                {images.map((_, index) => (
+                  <ImageDot
+                    key={index}
+                    active={index === currentImageIndex}
+                    onClick={() => setCurrentImageIndex(index)}
                   />
-                </div>
-              ))}
-            </Slider>
-          ) : (
-            <VenueImage 
-              src="/placeholder-image.jpg"
-              alt={venue.name}
-            />
+                ))}
+              </ImageDots>
+            </>
           )}
-        </ImageGallery>
-      </ImageContainer>
+        </ImageWrapper>
+      </ImageSection>
 
-      <VenueHeader>
-        <VenueTitle>{venue.name}</VenueTitle>
-        <VenueSubInfo>
-          <span>{venue.maxGuests} guests</span>
-          <span>•</span>
-          <span><FaStar className="fa-star" /> {venue.rating.toFixed(1)}</span>
-          {venue.meta.wifi && (
-            <>
-              <span>•</span>
-              <span><FaWifi className="fa-wifi" /></span>
-            </>
-          )}
-          {venue.meta.parking && (
-            <>
-              <span>•</span>
-              <span><FaParking className="fa-parking" /></span>
-            </>
-          )}
-          {venue.meta.breakfast && (
-            <>
-              <span>•</span>
-              <span><FaCoffee className="fa-coffee" /></span>
-            </>
-          )}
-          {venue.meta.pets && (
-            <>
-              <span>•</span>
-              <span><FaPaw className="fa-paw" /></span>
-            </>
-          )}
-        </VenueSubInfo>
-      </VenueHeader>
+      <ContentWrapper>
+        <LeftColumn>
+          <VenueHeader>
+            <VenueTitle>{venue.name}</VenueTitle>
+            <VenueSubHeader>
+              <VenueLocation>
+                <FaMapMarkerAlt />
+                {venue.location.city}, {venue.location.country}
+              </VenueLocation>
+              {venue.rating && (
+                <VenueRating>
+                  <FaStar /> {venue.rating.toFixed(1)}
+                </VenueRating>
+              )}
+            </VenueSubHeader>
+          </VenueHeader>
 
-      <VenueInfo>
-        <VenueDescription>
-          <DescriptionSection>
-            <h2>About this venue</h2>
-            <p>{venue.description}</p>
-          </DescriptionSection>
-          
-          <FacilitiesSection>
-            <h2>What this place offers</h2>
+          <Section>
+            <SectionTitle>Description</SectionTitle>
+            <VenueDescription>{venue.description}</VenueDescription>
+          </Section>
+
+          <Section>
+            <SectionTitle>Facilities</SectionTitle>
             <FacilitiesList>
-              <FacilityItem>
-                {venue.meta.wifi ? <FaCheck className="yes" /> : <FaTimes className="no" />}
-                <span>Wifi</span>
-              </FacilityItem>
-              <FacilityItem>
-                {venue.meta.parking ? <FaCheck className="yes" /> : <FaTimes className="no" />}
-                <span>Parking</span>
-              </FacilityItem>
-              <FacilityItem>
-                {venue.meta.breakfast ? <FaCheck className="yes" /> : <FaTimes className="no" />}
-                <span>Breakfast</span>
-              </FacilityItem>
-              <FacilityItem>
-                {venue.meta.pets ? <FaCheck className="yes" /> : <FaTimes className="no" />}
-                <span>Pets allowed</span>
-              </FacilityItem>
+              {facilities.map(({ name, available }) => (
+                <FacilityItem key={name}>
+                  <FacilityIcon available={available}>
+                    {available ? <FaCheck /> : <FaTimes />}
+                  </FacilityIcon>
+                  <span>{name}</span>
+                </FacilityItem>
+              ))}
             </FacilitiesList>
-          </FacilitiesSection>
+          </Section>
 
-          <LocationSection>
-            <h2>Location</h2>
-            <LocationDetails>
-              <FaMapMarkerAlt />
-              <div>
-                <p>{venue.location.address}</p>
-                <p>{venue.location.city}, {venue.location.country}</p>
-                {venue.location.zip && <p>{venue.location.zip}</p>}
-              </div>
-            </LocationDetails>
-          </LocationSection>
-        </VenueDescription>
+          <Section>
+            <SectionTitle>Location</SectionTitle>
+            <AddressInfo>
+              <p>{venue.location.address}</p>
+              <p>{venue.location.city}, {venue.location.zip}</p>
+              <p>{venue.location.country}</p>
+            </AddressInfo>
+          </Section>
+        </LeftColumn>
 
-        <VenueDetails>
-          <BookingSection>
-            <BookingSectionHeader>
-              <PriceRow>
-                <span>${venue.price}</span> / night
-              </PriceRow>
-            </BookingSectionHeader>
+        <RightColumn>
+          <BookingForm venue={venue} />
+        </RightColumn>
+      </ContentWrapper>
 
-            <BookingForm onSubmit={handleBooking}>
-              <DateInputGroup>
-                <label htmlFor="checkIn">Check-in</label>
-                <input
-                  type="date"
-                  id="checkIn"
-                  value={checkIn}
-                  onChange={(e) => setCheckIn(e.target.value)}
-                  min={today}
-                  required
-                />
-              </DateInputGroup>
-
-              <DateInputGroup>
-                <label htmlFor="checkOut">Check-out</label>
-                <input
-                  type="date"
-                  id="checkOut"
-                  value={checkOut}
-                  onChange={(e) => setCheckOut(e.target.value)}
-                  min={checkIn || today}
-                  required
-                />
-              </DateInputGroup>
-
-              <GuestInputGroup>
-                <label htmlFor="guests">Guests</label>
-                <select
-                  id="guests"
-                  value={guests}
-                  onChange={(e) => setGuests(Number(e.target.value))}
-                  required
-                >
-                  {[...Array(venue.maxGuests)].map((_, i) => (
-                    <option key={i + 1} value={i + 1}>
-                      {i + 1} {i === 0 ? 'guest' : 'guests'}
-                    </option>
-                  ))}
-                </select>
-              </GuestInputGroup>
-
-              <BookButton type="submit">
-                Book now
-              </BookButton>
-            </BookingForm>
-          </BookingSection>
-        </VenueDetails>
-      </VenueInfo>
+      <BookingSummaryModal />
     </VenueContainer>
   );
 }

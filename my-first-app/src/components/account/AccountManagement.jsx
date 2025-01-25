@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { FiEdit2 } from 'react-icons/fi';
 import { useUser } from '../../contexts/UserContext';
 import { getProfile, updateProfile } from '../../utils/api/profiles';
 import AccountForm from './AccountForm';

@@ -27,7 +27,7 @@ import {
 } from './VenueManagerCard.styles';
 
 function VenueManagerCard({ venue, onEdit, onDelete }) {
-  const { name, description, media, price, maxGuests, location, meta } = venue;
+  const { name, media, price, maxGuests, location, meta } = venue;
 
   const settings = {
     dots: true,

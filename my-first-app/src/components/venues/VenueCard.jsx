@@ -62,7 +62,9 @@ function VenueCard({ venue }) {
       <Info>
         <TitleRow>
           <h3>{venue.name}</h3>
-          <Rating><span>★</span> {venue.rating.toFixed(1)}</Rating>
+          {venue.rating && (
+            <Rating><span>★</span> {venue.rating.toFixed(1)}</Rating>
+          )}
         </TitleRow>
         <Location>{venue.location.city}, {venue.location.country}</Location>
         <Price><span>${venue.price}</span> per night</Price>
