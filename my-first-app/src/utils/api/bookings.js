@@ -38,4 +38,8 @@ export const deleteBooking = async (id) => {
   return fetchWithError(`${API_URLS.bookings}/${id}`, {
     method: 'DELETE'
   });
+};
+
+export const getVenueBookings = async (venueId) => {
+  return fetchWithError(`${API_URLS.bookings}?venue=${venueId}`);
 }; 

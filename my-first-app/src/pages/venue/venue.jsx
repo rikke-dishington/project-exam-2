@@ -1,84 +1,59 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import Slider from 'react-slick';
 import { 
   FaWifi, 
   FaParking, 
   FaCoffee, 
-  FaPaw,
-  FaRegHeart,
+  FaPaw, 
   FaMapMarkerAlt,
+  FaStar,
   FaCheck,
-  FaTimes,
-  FaStar
+  FaTimes
 } from 'react-icons/fa';
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 import { getVenueById } from '../../utils/api/venues';
 import {
   VenueContainer,
+  ImageContainer,
+  ContentWrapper,
+  LeftColumn,
+  RightColumn,
   VenueHeader,
   VenueTitle,
+  VenueRating,
   VenueLocation,
-  ImageGallery,
-  VenueImage,
-  VenueInfo,
   VenueDescription,
-  VenueDetails,
-  DetailItem,
-  DetailLabel,
-  DetailValue,
-  BookingSection,
-  BookingSectionHeader,
-  PriceRow,
-  BookingForm,
-  DateInputGroup,
-  GuestInputGroup,
-  BookButton,
-  BookingNote,
-  VenueSubInfo,
   FacilitiesSection,
   FacilitiesList,
   FacilityItem,
-  ImageContainer,
-  HeartButton,
-  LocationSection,
-  LocationDetails,
-  DescriptionSection
+  FacilityIcon,
+  BookingSection,
+  BookingForm,
+  PriceInfo,
+  TotalPrice,
+  LoadingSpinner,
+  ErrorMessage,
+  MaxGuests,
+  AddressContent
 } from './venue.styles';
-import { useTheme } from 'styled-components';
+import GuestSelector from '../../components/venues/GuestSelector';
+import DateSelector from '../../components/venues/DateSelector';
+import ImageCarousel from '../../components/venues/ImageCarousel';
 
 function Venue() {
   const { id } = useParams();
   const [venue, setVenue] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [checkIn, setCheckIn] = useState('');
-  const [checkOut, setCheckOut] = useState('');
   const [guests, setGuests] = useState(1);
-  const [isFavorite, setIsFavorite] = useState(false);
-  const theme = useTheme();
-
-  const today = new Date().toISOString().split('T')[0];
-
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    arrows: true,
-    autoplay: false,
-    adaptiveHeight: true,
-    fade: true,
-    cssEase: 'linear'
-  };
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [showGuestSelector, setShowGuestSelector] = useState(false);
+  const [showDateSelector, setShowDateSelector] = useState(false);
 
   useEffect(() => {
     const fetchVenue = async () => {
       try {
         const data = await getVenueById(id);
-        console.log('Venue data:', data);
         setVenue(data);
       } catch (err) {
         setError(err.message);
@@ -90,173 +65,165 @@ function Venue() {
     fetchVenue();
   }, [id]);
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-  if (!venue) return <div>Venue not found</div>;
-
-  const handleBooking = (e) => {
-    e.preventDefault();
-    console.log('Booking details:', { checkIn, checkOut, guests });
+  const handleGuestChange = (newCount) => {
+    setGuests(newCount);
   };
+
+  const handleDateChange = (dates) => {
+    const [start, end] = dates;
+    console.log('Date change:', start, end); // Debug log
+    setStartDate(start);
+    setEndDate(end);
+  };
+
+  const formatDateRange = () => {
+    if (!startDate || !endDate) return 'Select dates';
+    const formatDate = (date) => {
+      if (!date) return '';
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      });
+    };
+    return `${formatDate(startDate)} - ${formatDate(endDate)}`;
+  };
+
+  const handleDateButtonClick = (e) => {
+    e.preventDefault();
+    setShowDateSelector(prev => !prev);
+  };
+
+  const closeDateSelector = () => {
+    setShowDateSelector(false);
+  };
+
+  if (isLoading) return <LoadingSpinner>Loading...</LoadingSpinner>;
+  if (error) return <ErrorMessage>{error}</ErrorMessage>;
+  if (!venue) return <ErrorMessage>Venue not found</ErrorMessage>;
 
   return (
     <VenueContainer>
-      <ImageContainer>
-        <HeartButton onClick={() => setIsFavorite(!isFavorite)}>
-          <FaRegHeart />
-        </HeartButton>
-        <ImageGallery>
-          {venue.media && venue.media.length > 0 ? (
-            <Slider {...settings}>
-              {venue.media.map((imageUrl, index) => (
-                <div key={index}>
-                  <VenueImage 
-                    src={imageUrl || '/placeholder-image.jpg'} 
-                    alt={`${venue.name} - image ${index + 1}`}
-                  />
-                </div>
-              ))}
-            </Slider>
-          ) : (
-            <VenueImage 
-              src="/placeholder-image.jpg"
-              alt={venue.name}
-            />
-          )}
-        </ImageGallery>
-      </ImageContainer>
+      {venue.media && venue.media.length > 0 && (
+        <ImageCarousel images={venue.media} />
+      )}
 
-      <VenueHeader>
-        <VenueTitle>{venue.name}</VenueTitle>
-        <VenueSubInfo>
-          <span>{venue.maxGuests} guests</span>
-          <span>•</span>
-          <span><FaStar className="fa-star" /> {venue.rating.toFixed(1)}</span>
-          {venue.meta.wifi && (
-            <>
-              <span>•</span>
-              <span><FaWifi className="fa-wifi" /></span>
-            </>
-          )}
-          {venue.meta.parking && (
-            <>
-              <span>•</span>
-              <span><FaParking className="fa-parking" /></span>
-            </>
-          )}
-          {venue.meta.breakfast && (
-            <>
-              <span>•</span>
-              <span><FaCoffee className="fa-coffee" /></span>
-            </>
-          )}
-          {venue.meta.pets && (
-            <>
-              <span>•</span>
-              <span><FaPaw className="fa-paw" /></span>
-            </>
-          )}
-        </VenueSubInfo>
-      </VenueHeader>
+      <ContentWrapper>
+        <LeftColumn>
+          <VenueHeader>
+            <div>
+              <VenueTitle>{venue.name}</VenueTitle>
+              {venue.rating && (
+                <VenueRating>
+                  <FaStar /> {venue.rating.toFixed(1)}
+                </VenueRating>
+              )}
+            </div>
+          </VenueHeader>
 
-      <VenueInfo>
-        <VenueDescription>
-          <DescriptionSection>
+          <VenueDescription>
             <h2>About this venue</h2>
             <p>{venue.description}</p>
-          </DescriptionSection>
-          
+          </VenueDescription>
+
           <FacilitiesSection>
-            <h2>What this place offers</h2>
+            <h2>Facilities</h2>
             <FacilitiesList>
               <FacilityItem>
-                {venue.meta.wifi ? <FaCheck className="yes" /> : <FaTimes className="no" />}
-                <span>Wifi</span>
+                <FacilityIcon hasFeature={venue.meta?.wifi}>
+                  {venue.meta?.wifi ? <FaCheck /> : <FaTimes />}
+                </FacilityIcon>
+                WiFi
               </FacilityItem>
               <FacilityItem>
-                {venue.meta.parking ? <FaCheck className="yes" /> : <FaTimes className="no" />}
-                <span>Parking</span>
+                <FacilityIcon hasFeature={venue.meta?.parking}>
+                  {venue.meta?.parking ? <FaCheck /> : <FaTimes />}
+                </FacilityIcon>
+                Parking
               </FacilityItem>
               <FacilityItem>
-                {venue.meta.breakfast ? <FaCheck className="yes" /> : <FaTimes className="no" />}
-                <span>Breakfast</span>
+                <FacilityIcon hasFeature={venue.meta?.breakfast}>
+                  {venue.meta?.breakfast ? <FaCheck /> : <FaTimes />}
+                </FacilityIcon>
+                Breakfast
               </FacilityItem>
               <FacilityItem>
-                {venue.meta.pets ? <FaCheck className="yes" /> : <FaTimes className="no" />}
-                <span>Pets allowed</span>
+                <FacilityIcon hasFeature={venue.meta?.pets}>
+                  {venue.meta?.pets ? <FaCheck /> : <FaTimes />}
+                </FacilityIcon>
+                Pets allowed
               </FacilityItem>
             </FacilitiesList>
           </FacilitiesSection>
 
-          <LocationSection>
-            <h2>Location</h2>
-            <LocationDetails>
+          <VenueDescription>
+            <h2>Address</h2>
+            <AddressContent>
               <FaMapMarkerAlt />
-              <div>
-                <p>{venue.location.address}</p>
-                <p>{venue.location.city}, {venue.location.country}</p>
-                {venue.location.zip && <p>{venue.location.zip}</p>}
-              </div>
-            </LocationDetails>
-          </LocationSection>
-        </VenueDescription>
+              {venue.location.address && <span>{venue.location.address}</span>}
+              <span>{venue.location.city}</span>
+              <span>{venue.location.country}</span>
+              {venue.location.zip && <span>{venue.location.zip}</span>}
+            </AddressContent>
+          </VenueDescription>
+        </LeftColumn>
 
-        <VenueDetails>
+        <RightColumn>
           <BookingSection>
-            <BookingSectionHeader>
-              <PriceRow>
-                <span>${venue.price}</span> / night
-              </PriceRow>
-            </BookingSectionHeader>
-
-            <BookingForm onSubmit={handleBooking}>
-              <DateInputGroup>
-                <label htmlFor="checkIn">Check-in</label>
-                <input
-                  type="date"
-                  id="checkIn"
-                  value={checkIn}
-                  onChange={(e) => setCheckIn(e.target.value)}
-                  min={today}
-                  required
-                />
-              </DateInputGroup>
-
-              <DateInputGroup>
-                <label htmlFor="checkOut">Check-out</label>
-                <input
-                  type="date"
-                  id="checkOut"
-                  value={checkOut}
-                  onChange={(e) => setCheckOut(e.target.value)}
-                  min={checkIn || today}
-                  required
-                />
-              </DateInputGroup>
-
-              <GuestInputGroup>
-                <label htmlFor="guests">Guests</label>
-                <select
-                  id="guests"
-                  value={guests}
-                  onChange={(e) => setGuests(Number(e.target.value))}
-                  required
+            <h2>Book Your Stay</h2>
+            <PriceInfo>
+              <span>${venue.price} / night</span>
+              <MaxGuests>{venue.maxGuests} guests</MaxGuests>
+            </PriceInfo>
+            
+            <BookingForm onSubmit={(e) => e.preventDefault()}>
+              <div style={{ position: 'relative' }}>
+                <button 
+                  type="button" 
+                  className="date-button"
+                  onClick={handleDateButtonClick}
                 >
-                  {[...Array(venue.maxGuests)].map((_, i) => (
-                    <option key={i + 1} value={i + 1}>
-                      {i + 1} {i === 0 ? 'guest' : 'guests'}
-                    </option>
-                  ))}
-                </select>
-              </GuestInputGroup>
+                  {formatDateRange()}
+                </button>
+                {showDateSelector && (
+                  <DateSelector
+                    startDate={startDate}
+                    endDate={endDate}
+                    onChange={handleDateChange}
+                    onClose={closeDateSelector}
+                  />
+                )}
+              </div>
+              
+              <div style={{ position: 'relative' }}>
+                <button 
+                  type="button" 
+                  className="guest-button"
+                  onClick={() => setShowGuestSelector(!showGuestSelector)}
+                >
+                  {guests} {guests === 1 ? 'guest' : 'guests'}
+                </button>
+                {showGuestSelector && (
+                  <GuestSelector
+                    guests={guests}
+                    maxGuests={venue.maxGuests}
+                    onChange={handleGuestChange}
+                    onClose={() => setShowGuestSelector(false)}
+                  />
+                )}
+              </div>
 
-              <BookButton type="submit">
-                Book now
-              </BookButton>
+              <button 
+                type="submit" 
+                className="book-button"
+                disabled={!startDate || !endDate}
+              >
+                Book Now
+              </button>
             </BookingForm>
           </BookingSection>
-        </VenueDetails>
-      </VenueInfo>
+        </RightColumn>
+      </ContentWrapper>
     </VenueContainer>
   );
 }
