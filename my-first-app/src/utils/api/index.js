@@ -111,7 +111,6 @@ export const venueEndpoints = {
       const data = await response.json();
       throw new Error(data.message || 'Failed to delete venue');
     }
-    return true;
   }
 };
 
@@ -167,11 +166,25 @@ export const profileEndpoints = {
     const response = await fetch(`${HOLIDAZE_URL}/profiles/${name}`, {
       method: 'PUT',
       headers: getHeaders(true),
-      body: JSON.stringify(profileData)
+      body: JSON.stringify({
+        ...profileData,
+        // Ensure avatar and banner are properly formatted
+        avatar: profileData.avatar ? {
+          url: profileData.avatar.url,
+          alt: profileData.avatar.alt
+        } : undefined,
+        banner: profileData.banner ? {
+          url: profileData.banner.url,
+          alt: profileData.banner.alt
+        } : undefined
+      })
     });
     
     const data = await response.json();
-    if (!response.ok) throw new Error(data.message || 'Failed to update profile');
+    if (!response.ok) {
+      console.error('Profile update error:', data);
+      throw new Error(data.message || 'Failed to update profile');
+    }
     return data;
   },
 

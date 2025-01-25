@@ -37,7 +37,6 @@ function BookingsList() {
           _venue: true
         });
         
-        // Sort bookings by date, most recent first
         const sortedBookings = data.sort((a, b) => 
           new Date(b.dateFrom) - new Date(a.dateFrom)
         );
