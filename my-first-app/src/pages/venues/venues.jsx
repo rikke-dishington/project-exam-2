@@ -1,28 +1,63 @@
 import { useState, useEffect } from 'react';
-import { getAllVenues } from '../../utils/api/venues';
+import { useSearchParams } from 'react-router-dom';
+import { FaSearch, FaTimes, FaFilter } from 'react-icons/fa';
+import { venueApi } from '../../utils/api';
 import VenueCard from '../../components/venues/VenueCard';
-import { Section, Grid, Title } from '../../components/venues/TopRatedVenues.styles';
-import { LoadMoreButton } from './venues.styles';
+import LoadingSpinner from '../../components/shared/LoadingSpinner/LoadingSpinner';
+import { 
+  Container, 
+  Header,
+  Title, 
+  SearchContainer,
+  SearchInputWrapper,
+  SearchInput,
+  ClearButton,
+  SearchButton,
+  Grid, 
+  ErrorMessage,
+  FiltersSection,
+  FilterButton,
+  ActiveFilterDot,
+  ResultsInfo,
+  ControlsBar,
+  ControlsGroup,
+  Select,
+  ResultCount,
+} from './venues.styles';
+import { SelectWrapper, SortContainer } from '../../components/shared/SortSelect/SortSelect.styles';
+import Filters from '../../components/venues/Filters/Filters';
+import FilterDrawer from '../../components/venues/FilterDrawer/FilterDrawer';
 
 function Venues() {
   const [venues, setVenues] = useState([]);
+  const [sortedVenues, setSortedVenues] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const ITEMS_PER_PAGE = 12;
-  const LOAD_MORE_COUNT = 8;
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('q') || '');
+  const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'default');
+  const [filters, setFilters] = useState({
+    wifi: false,
+    parking: false,
+    breakfast: false,
+    pets: false,
+    maxPrice: 1000,
+  });
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
   useEffect(() => {
     const fetchVenues = async () => {
-      setIsLoading(true);
       try {
-        const data = await getAllVenues({ 
-          limit: ITEMS_PER_PAGE,
-          offset: 0
-        });
-        setVenues(data);
-        setHasMore(data.length === ITEMS_PER_PAGE);
+        setIsLoading(true);
+        const query = searchParams.get('q');
+        
+        if (query) {
+          const data = await venueApi.search(query);
+          setVenues(data);
+        } else {
+          const data = await venueApi.getAll();
+          setVenues(data);
+        }
       } catch (err) {
         setError(err.message);
       } finally {
@@ -31,58 +66,208 @@ function Venues() {
     };
 
     fetchVenues();
-  }, []);
+  }, [searchParams]);
 
-  const handleLoadMore = async () => {
-    setIsLoading(true);
-    try {
-      const offset = page * ITEMS_PER_PAGE + ((page - 1) * LOAD_MORE_COUNT);
-      const newData = await getAllVenues({ 
-        limit: LOAD_MORE_COUNT,
-        offset: offset
+  useEffect(() => {
+    const filterVenues = (venuesList) => {
+      return venuesList.filter(venue => {
+        // Price filter
+        if (venue.price > filters.maxPrice) {
+          return false;
+        }
+
+        // Get facilities array, ensuring it exists
+        const facilities = venue.meta?.facilities || [];
+
+        // Amenities filters
+        if (filters.wifi && !venue.meta?.wifi) {
+          return false;
+        }
+        if (filters.parking && !venue.meta?.parking) {
+          return false;
+        }
+        if (filters.breakfast && !venue.meta?.breakfast) {
+          return false;
+        }
+        if (filters.pets && !venue.meta?.pets) {
+          return false;
+        }
+
+        return true;
       });
-      
-      if (newData.length > 0) {
-        setVenues(prevVenues => [...prevVenues, ...newData]);
-        setPage(prevPage => prevPage + 1);
-        setHasMore(newData.length === LOAD_MORE_COUNT);
+    };
+
+    const filteredVenues = filterVenues(venues);
+
+    // Apply sorting
+    let sortedResults = [...filteredVenues];
+    switch (sortBy) {
+      case 'price_low':
+        sortedResults.sort((a, b) => a.price - b.price);
+        break;
+      case 'price_high':
+        sortedResults.sort((a, b) => b.price - a.price);
+        break;
+      case 'rating':
+        sortedResults.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+        break;
+      default:
+        break;
+    }
+
+    setSortedVenues(sortedResults);
+  }, [venues, filters, sortBy]);
+
+  const handleSort = (e) => {
+    const value = e.target.value;
+    setSortBy(value);
+    setSearchParams(prev => {
+      if (value === 'default') {
+        prev.delete('sort');
       } else {
-        setHasMore(false);
+        prev.set('sort', value);
       }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
+      return prev;
+    });
+  };
+
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      setSearchParams({ q: searchTerm.trim(), ...(sortBy !== 'default' && { sort: sortBy }) });
+    } else {
+      setSearchParams(sortBy !== 'default' ? { sort: sortBy } : {});
     }
   };
 
-  if (error) return <div>Error: {error}</div>;
+  const handleClearSearch = () => {
+    setSearchTerm('');
+    setSearchParams(sortBy !== 'default' ? { sort: sortBy } : {});
+  };
+
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+    setSearchParams(prev => {
+      Object.entries(newFilters).forEach(([key, value]) => {
+        if (key === 'maxPrice' && value === 1000) {
+          prev.delete(key);
+        } else if (value === false) {
+          prev.delete(key);
+        } else {
+          prev.set(key, value.toString());
+        }
+      });
+      return prev;
+    });
+  };
+
+  const renderSearchBar = () => (
+    <SearchContainer onSubmit={handleSearch}>
+      <SearchInputWrapper>
+        <SearchInput
+          type="text"
+          placeholder="Search venues..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        {searchTerm && (
+          <ClearButton 
+            type="button"
+            onClick={handleClearSearch}
+            aria-label="Clear search"
+          >
+            <FaTimes />
+          </ClearButton>
+        )}
+      </SearchInputWrapper>
+      <SearchButton type="submit">
+        <FaSearch />
+      </SearchButton>
+    </SearchContainer>
+  );
+
+  const filterProps = {
+    onFilterChange: handleFilterChange,
+    initialFilters: filters,
+    totalResults: sortedVenues.length,
+  };
+
+  if (isLoading) {
+    return (
+      <Container>
+        <Header>
+          <Title>Find your perfect stay</Title>
+          {renderSearchBar()}
+        </Header>
+        <LoadingSpinner 
+          text={searchParams.get('q') 
+            ? `Searching for "${searchParams.get('q')}"...` 
+            : 'Loading venues...'
+          }
+        />
+      </Container>
+    );
+  }
+
+  const hasActiveFilters = Object.entries(filters).some(([key, value]) => {
+    if (key === 'maxPrice') return value !== 1000;
+    return value === true;
+  });
 
   return (
-    <main>
-      <Section>
-        <Title>All Venues</Title>
-        {isLoading && venues.length === 0 ? (
-          <div>Loading venues...</div>
-        ) : venues.length === 0 ? (
-          <div>No venues found</div>
-        ) : (
-          <Grid>
-            {venues.map(venue => (
-              <VenueCard key={venue.id} venue={venue} />
-            ))}
-          </Grid>
-        )}
-        {hasMore && venues.length >= ITEMS_PER_PAGE && (
-          <LoadMoreButton 
-            onClick={handleLoadMore} 
-            disabled={isLoading}
-          >
-            {isLoading ? 'Loading...' : 'Load More Venues'}
-          </LoadMoreButton>
-        )}
-      </Section>
-    </main>
+    <Container>
+      <Header>
+        <Title>Find your perfect stay</Title>
+        {renderSearchBar()}
+      </Header>
+      
+      {venues.length > 0 && (
+        <FiltersSection>
+          <ResultsInfo>
+            <span>{sortedVenues.length} venues found</span>
+            <FilterButton onClick={() => setIsFilterDrawerOpen(true)}>
+              <FaFilter /> 
+              <span>Filters</span>
+              {hasActiveFilters && <ActiveFilterDot />}
+            </FilterButton>
+          </ResultsInfo>
+
+          <FilterDrawer 
+            isOpen={isFilterDrawerOpen}
+            onClose={() => setIsFilterDrawerOpen(false)}
+            {...filterProps}
+          />
+          
+          <SortContainer>
+            <SelectWrapper>
+              <Select value={sortBy} onChange={handleSort}>
+                <option value="default">Recommended</option>
+                <option value="price_low">Price: Low to High</option>
+                <option value="price_high">Price: High to Low</option>
+                <option value="rating">Highest Rated</option>
+              </Select>
+            </SelectWrapper>
+          </SortContainer>
+        </FiltersSection>
+      )}
+
+      {venues.length === 0 ? (
+        <ErrorMessage>
+          {searchParams.get('q') 
+            ? `No venues found matching "${searchParams.get('q')}"`
+            : 'No venues available'}
+        </ErrorMessage>
+      ) : (
+        <Grid>
+          {sortedVenues.map(venue => (
+            <VenueCard 
+              key={venue.id} 
+              venue={venue} 
+            />
+          ))}
+        </Grid>
+      )}
+    </Container>
   );
 }
 
