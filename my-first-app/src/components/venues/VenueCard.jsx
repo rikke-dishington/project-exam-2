@@ -1,74 +1,51 @@
-import { useNavigate } from 'react-router-dom';
-import Slider from 'react-slick';
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import { FaRegHeart } from 'react-icons/fa';
-import { 
-  Card, 
-  ImageSlider,
-  ImageContainer, 
-  Image, 
-  Info, 
-  TitleRow,
-  Location, 
-  Rating,
+import { Link } from 'react-router-dom';
+import { FaMapMarkerAlt, FaStar } from 'react-icons/fa';
+import {
+  Card,
+  ImageContainer,
+  Image,
+  Content,
+  Title,
+  Location,
   Price,
-  HeartButton 
+  Rating,
 } from './VenueCard.styles';
 
 function VenueCard({ venue }) {
-  const navigate = useNavigate();
+  const { id, name, media, price, rating, location } = venue;
   
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    arrows: true,
-    autoplay: false
-  };
-
-  const handleCardClick = () => {
-    navigate(`/venue/${venue.id}`);
-  };
+  // Get the first image URL or use placeholder
+  const imageUrl = media?.[0]?.url || '/placeholder-image.jpg';
+  const imageAlt = media?.[0]?.alt || name;
 
   return (
-    <Card onClick={handleCardClick}>
-      <ImageContainer>
-        <HeartButton onClick={(e) => e.stopPropagation()}>
-          <FaRegHeart />
-        </HeartButton>
-        {venue.media.length > 1 ? (
-          <ImageSlider>
-            <Slider {...settings}>
-              {venue.media.map((imageUrl, index) => (
-                <div key={index}>
-                  <Image 
-                    src={imageUrl || '/placeholder-image.jpg'} 
-                    alt={`${venue.name} - image ${index + 1}`}
-                  />
-                </div>
-              ))}
-            </Slider>
-          </ImageSlider>
-        ) : (
+    <Card>
+      <Link to={`/venue/${id}`}>
+        <ImageContainer>
           <Image 
-            src={venue.media[0] || '/placeholder-image.jpg'} 
-            alt={venue.name}
+            src={imageUrl} 
+            alt={imageAlt}
+            onError={(e) => {
+              e.target.src = '/placeholder-image.jpg';
+            }}
           />
-        )}
-      </ImageContainer>
-      <Info>
-        <TitleRow>
-          <h3>{venue.name}</h3>
-          {venue.rating && (
-            <Rating><span>★</span> {venue.rating.toFixed(1)}</Rating>
-          )}
-        </TitleRow>
-        <Location>{venue.location.city}, {venue.location.country}</Location>
-        <Price><span>${venue.price}</span> per night</Price>
-      </Info>
+        </ImageContainer>
+        <Content>
+          <Title>{name}</Title>
+          <Location>
+            <FaMapMarkerAlt />
+            {location?.city}, {location?.country}
+          </Location>
+          <div>
+            <Price>${price} <span>/ night</span></Price>
+            {rating > 0 && (
+              <Rating>
+                <FaStar /> {rating.toFixed(1)}
+              </Rating>
+            )}
+          </div>
+        </Content>
+      </Link>
     </Card>
   );
 }

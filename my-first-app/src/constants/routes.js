@@ -1,6 +1,6 @@
 export const ROUTES = {
   // Public routes
-  HOME: '/',
+  HOME: '/venues',
   LOGIN: '/login',
   REGISTER: '/register',
   VENUES: '/venues',

@@ -29,8 +29,8 @@ export const bookingApi = {
       method: 'DELETE',
     });
   },
-};
 
-export const getVenueBookings = async (venueId) => {
-  return fetchWithError(`${API_URLS.bookings}?venue=${venueId}`);
+  getVenueBookings: (venueId) => {
+    return apiClient(`${API_ROUTES.bookings.base}?venue=${venueId}`);
+  },
 }; 

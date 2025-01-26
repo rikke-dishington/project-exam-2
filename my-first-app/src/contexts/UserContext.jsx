@@ -1,115 +1,52 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { API_URLS, getHeaders } from '../utils/api/config';
+import { authApi } from '../utils/api';
 
-const UserContext = createContext({
-  user: null,
-  setUser: () => {},
-  isLoading: false,
-  error: null
-});
+const UserContext = createContext();
 
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
-    const initializeUser = async () => {
-      try {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-          const userData = JSON.parse(storedUser);
-          const response = await fetch(`${API_URLS.profiles}/${userData.name}`, {
-            headers: getHeaders()
-          });
-          
-          if (!response.ok) {
-            throw new Error('Failed to fetch user profile');
-          }
-          
-          const profile = await response.json();
-          setUser({ ...userData, ...profile });
-        }
-      } catch (err) {
-        console.error('Error initializing user:', err);
-        setError(err.message);
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
-        setUser(null);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    initializeUser();
-  }, []);
-
-  const updateUser = (newUser) => {
-    try {
-      if (newUser) {
-        localStorage.setItem('user', JSON.stringify(newUser));
-      } else {
-        localStorage.removeItem('user');
-      }
-      setUser(newUser);
-    } catch (error) {
-      console.error('Error updating user:', error);
+    const token = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
+    
+    if (token && storedUser) {
+      setUser(JSON.parse(storedUser));
     }
-  };
-
-  const logout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    setUser(null);
-    navigate('/login');
-  };
+    setIsLoading(false);
+  }, []);
 
   const login = async (credentials) => {
     try {
-      const response = await fetch(API_URLS.auth.login, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(credentials),
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) throw new Error(data.message);
-      
-      updateUser(data);
-      navigate('/');
+      const data = await authApi.login(credentials);
+      setUser(data);
+      localStorage.setItem('user', JSON.stringify(data));
+      return data;
     } catch (error) {
       throw error;
     }
   };
 
-  const value = {
-    user,
-    updateUser,
-    logout,
-    login,
-    isAuthenticated: !!user,
-    isLoading,
-    error
+  const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
   };
 
   return (
-    <UserContext.Provider value={value}>
+    <UserContext.Provider value={{ user, login, logout, isLoading }}>
       {children}
     </UserContext.Provider>
   );
 }
 
-export const useUser = () => {
+export function useUser() {
   const context = useContext(UserContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useUser must be used within a UserProvider');
   }
   return context;
-};
+}
 
 export { UserContext }; 
