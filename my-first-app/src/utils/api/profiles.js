@@ -1,20 +1,22 @@
-import { API_URLS, fetchWithError } from './config';
+import { apiClient, API_ROUTES } from './config';
 
-export const getProfile = async (name) => {
-  return fetchWithError(`${API_URLS.profiles}/${name}`);
-};
+export const profileApi = {
+  getProfile: (name) => {
+    return apiClient(API_ROUTES.profiles.byName(name));
+  },
 
-export const updateProfile = async (name, profileData) => {
-  return fetchWithError(`${API_URLS.profiles}/${name}`, {
-    method: 'PUT',
-    body: JSON.stringify(profileData)
-  });
-};
+  updateProfile: (name, data) => {
+    return apiClient(API_ROUTES.profiles.byName(name), {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
 
-export const getProfileVenues = async (name) => {
-  return fetchWithError(`${API_URLS.profiles}/${name}/venues`);
-};
+  getProfileVenues: (name) => {
+    return apiClient(API_ROUTES.profiles.venues(name));
+  },
 
-export const getProfileBookings = async (name) => {
-  return fetchWithError(`${API_URLS.profiles}/${name}/bookings`);
+  getProfileBookings: (name) => {
+    return apiClient(API_ROUTES.profiles.bookings(name));
+  },
 };

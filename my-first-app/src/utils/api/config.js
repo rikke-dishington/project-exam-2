@@ -1,13 +1,70 @@
-export const API_BASE_URL = 'https://api.noroff.dev/api/v1';
+const API_BASE_URL = 'https://v2.api.noroff.dev';
 
-export const API_URLS = {
-  auth: {
-    register: `${API_BASE_URL}/auth/register`,
-    login: `${API_BASE_URL}/auth/login`,
+// Common headers and options for all requests
+const defaultOptions = {
+  headers: {
+    'Content-Type': 'application/json',
   },
-  venues: `${API_BASE_URL}/holidaze/venues`,
-  bookings: `${API_BASE_URL}/holidaze/bookings`,
-  profiles: `${API_BASE_URL}/holidaze/profiles`,
+};
+
+// Helper function to handle API responses
+const handleResponse = async (response) => {
+  const data = await response.json();
+  
+  if (!response.ok) {
+    throw new Error(data.errors?.[0]?.message || 'An error occurred');
+  }
+  
+  return data.data; // The v2 API wraps responses in a data property
+};
+
+// Main API client function
+export const apiClient = async (endpoint, options = {}) => {
+  const url = `${API_BASE_URL}${endpoint}`;
+  const token = localStorage.getItem('token');
+
+  // Merge default options with provided options
+  const requestOptions = {
+    ...defaultOptions,
+    ...options,
+    headers: {
+      ...defaultOptions.headers,
+      ...(token && { Authorization: `Bearer ${token}` }),
+      ...options.headers,
+    },
+  };
+
+  try {
+    const response = await fetch(url, requestOptions);
+    return handleResponse(response);
+  } catch (error) {
+    console.error(`API Error: ${error.message}`);
+    throw error;
+  }
+};
+
+// API Routes
+export const API_ROUTES = {
+  auth: {
+    register: '/auth/register',
+    login: '/auth/login',
+    createApiKey: '/auth/create-api-key',
+  },
+  venues: {
+    base: '/holidaze/venues',
+    search: '/holidaze/venues/search',
+    byId: (id) => `/holidaze/venues/${id}`,
+  },
+  profiles: {
+    base: '/holidaze/profiles',
+    byName: (name) => `/holidaze/profiles/${name}`,
+    bookings: (name) => `/holidaze/profiles/${name}/bookings`,
+    venues: (name) => `/holidaze/profiles/${name}/venues`,
+  },
+  bookings: {
+    base: '/holidaze/bookings',
+    byId: (id) => `/holidaze/bookings/${id}`,
+  },
 };
 
 export const getHeaders = () => {
@@ -16,16 +73,6 @@ export const getHeaders = () => {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
-};
-
-export const handleResponse = async (response) => {
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({
-      message: 'An error occurred'
-    }));
-    throw new Error(error.message || 'An error occurred');
-  }
-  return response.json();
 };
 
 export class ApiError extends Error {

@@ -1,43 +1,34 @@
-import { API_URLS, fetchWithError } from './config';
+import { apiClient, API_ROUTES } from './config';
 
-export const getBookings = async (options = {}) => {
-  const params = new URLSearchParams();
-  
-  if (options._customer) params.append('_customer', options._customer);
-  if (options._venue) params.append('_venue', options._venue);
-  if (options.sort) params.append('sort', options.sort);
-  if (options.sortOrder) params.append('sortOrder', options.sortOrder);
-  if (options.limit) params.append('limit', options.limit);
-  if (options.offset) params.append('offset', options.offset);
-  
-  const queryString = params.toString();
-  const url = `${API_URLS.bookings}${queryString ? `?${queryString}` : ''}`;
-  
-  return fetchWithError(url);
-};
+export const bookingApi = {
+  getAll: (params = {}) => {
+    const queryString = new URLSearchParams(params).toString();
+    return apiClient(`${API_ROUTES.bookings.base}?${queryString}`);
+  },
 
-export const getBookingById = async (id) => {
-  return fetchWithError(`${API_URLS.bookings}/${id}`);
-};
+  getById: (id) => {
+    return apiClient(API_ROUTES.bookings.byId(id));
+  },
 
-export const createBooking = async (bookingData) => {
-  return fetchWithError(API_URLS.bookings, {
-    method: 'POST',
-    body: JSON.stringify(bookingData)
-  });
-};
+  create: (data) => {
+    return apiClient(API_ROUTES.bookings.base, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
 
-export const updateBooking = async (id, bookingData) => {
-  return fetchWithError(`${API_URLS.bookings}/${id}`, {
-    method: 'PUT',
-    body: JSON.stringify(bookingData)
-  });
-};
+  update: (id, data) => {
+    return apiClient(API_ROUTES.bookings.byId(id), {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
 
-export const deleteBooking = async (id) => {
-  return fetchWithError(`${API_URLS.bookings}/${id}`, {
-    method: 'DELETE'
-  });
+  delete: (id) => {
+    return apiClient(API_ROUTES.bookings.byId(id), {
+      method: 'DELETE',
+    });
+  },
 };
 
 export const getVenueBookings = async (venueId) => {
