@@ -1,19 +1,15 @@
 const API_BASE_URL = 'https://v2.api.noroff.dev';
 
-// Function to get stored API key
 const getStoredApiKey = () => localStorage.getItem('noroff_api_key');
 
-// Function to store API key
 const storeApiKey = (key) => localStorage.setItem('noroff_api_key', key);
 
-// Common headers and options for all requests
 const defaultOptions = {
   headers: {
     'Content-Type': 'application/json',
   },
 };
 
-// Helper function to handle API responses
 const handleResponse = async (response) => {
   const data = await response.json();
   
@@ -25,7 +21,6 @@ const handleResponse = async (response) => {
   return data;
 };
 
-// Main API client function
 export const apiClient = async (endpoint, options = {}) => {
   const url = `${API_BASE_URL}${endpoint}`;
   const token = localStorage.getItem('token');
@@ -35,7 +30,6 @@ export const apiClient = async (endpoint, options = {}) => {
   console.log('Endpoint:', endpoint);
   console.log('API Key:', apiKey);
 
-  // Create headers
   const headers = new Headers({
     'Content-Type': 'application/json',
   });
@@ -51,12 +45,22 @@ export const apiClient = async (endpoint, options = {}) => {
   const requestOptions = {
     ...options,
     headers,
+    body: options.body ? JSON.stringify(JSON.parse(options.body)) : undefined
   };
 
-  console.log('Request headers:', Object.fromEntries(headers.entries()));
+  console.log('Request URL:', url);
+  console.log('Request options:', {
+    ...requestOptions,
+    body: requestOptions.body ? JSON.parse(requestOptions.body) : undefined
+  });
 
   try {
     const response = await fetch(url, requestOptions);
+    
+    if (response.status === 204 || response.headers.get('content-length') === '0') {
+      return null;
+    }
+
     const data = await response.json();
     
     if (!response.ok) {
@@ -66,12 +70,14 @@ export const apiClient = async (endpoint, options = {}) => {
     
     return data;
   } catch (error) {
+    if (error.name === 'SyntaxError') {
+      return null;
+    }
     console.error(`API Error:`, error);
     throw error;
   }
 };
 
-// Function to initialize API key
 export const initializeApiKey = async (retries = 3) => {
   const existingKey = getStoredApiKey();
   if (existingKey) {
@@ -95,13 +101,11 @@ export const initializeApiKey = async (retries = 3) => {
       if (i === retries - 1) {
         throw error;
       }
-      // Wait before retrying
       await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
     }
   }
 };
 
-// API Routes
 export const API_ROUTES = {
   auth: {
     register: '/auth/register',
@@ -112,6 +116,7 @@ export const API_ROUTES = {
     base: '/holidaze/venues',
     search: '/holidaze/venues/search',
     byId: (id) => `/holidaze/venues/${id}`,
+    bookings: (id) => `/holidaze/venues/${id}/bookings`
   },
   profiles: {
     base: '/holidaze/profiles',
