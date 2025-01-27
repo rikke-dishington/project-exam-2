@@ -9,26 +9,38 @@ export const authApi = {
   },
 
   login: async (credentials) => {
-    const data = await apiClient(API_ROUTES.auth.login, {
+    const response = await apiClient(API_ROUTES.auth.login, {
       method: 'POST',
       body: JSON.stringify(credentials),
     });
     
-    if (data.accessToken) {
-      localStorage.setItem('token', data.accessToken);
+    console.log('Login response:', response); // Debug log
+    
+    // The API returns the token in the data property
+    if (response.data?.accessToken) {
+      localStorage.setItem('token', response.data.accessToken);
+      localStorage.setItem('userName', response.data.name);
+    } else {
+      throw new Error('No access token received');
     }
     
-    return data;
+    return response.data;
   },
 
-  createApiKey: () => {
-    return apiClient(API_ROUTES.auth.createApiKey, {
+  createApiKey: async () => {
+    const response = await apiClient(API_ROUTES.auth.createApiKey, {
       method: 'POST',
+      body: JSON.stringify({
+        name: "Holidaze API Key"
+      })
     });
+    return response.data.key;
   },
 
   logout: () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('user');
   },
 
   isAuthenticated: () => {
