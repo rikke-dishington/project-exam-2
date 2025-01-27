@@ -1,36 +1,42 @@
 import { apiClient, API_ROUTES } from './config';
 
 export const venueApi = {
-  getAll: (params = {}) => {
+  getAll: async (params = {}) => {
     const queryString = new URLSearchParams(params).toString();
-    return apiClient(`${API_ROUTES.venues.base}?${queryString}`);
+    const response = await apiClient(`${API_ROUTES.venues.base}?${queryString}`);
+    return response.data;
   },
 
-  getById: (id) => {
-    return apiClient(API_ROUTES.venues.byId(id));
+  getById: async (id) => {
+    const response = await apiClient(API_ROUTES.venues.byId(id));
+    return response.data;
   },
 
-  search: (query) => {
-    return apiClient(`${API_ROUTES.venues.search}?q=${encodeURIComponent(query)}`);
+  search: async (query) => {
+    const response = await apiClient(`${API_ROUTES.venues.search}?q=${encodeURIComponent(query)}`);
+    return response.data;
   },
 
-  create: (data) => {
-    return apiClient(API_ROUTES.venues.base, {
+  create: async (data) => {
+    const response = await apiClient(API_ROUTES.venues.base, {
       method: 'POST',
       body: JSON.stringify(data),
     });
+    return response.data;
   },
 
-  update: (id, data) => {
-    return apiClient(API_ROUTES.venues.byId(id), {
+  update: async (id, data) => {
+    const response = await apiClient(API_ROUTES.venues.byId(id), {
       method: 'PUT',
       body: JSON.stringify(data),
     });
+    return response.data;
   },
 
-  delete: (id) => {
-    return apiClient(API_ROUTES.venues.byId(id), {
+  delete: async (id) => {
+    const response = await apiClient(API_ROUTES.venues.byId(id), {
       method: 'DELETE',
     });
+    return response.data;
   },
 };
