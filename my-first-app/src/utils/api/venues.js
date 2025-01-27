@@ -39,4 +39,101 @@ export const venueApi = {
     });
     return response.data;
   },
+
+  getVenuesByProfile: async (profileName) => {
+    try {
+      const response = await apiClient(API_ROUTES.profiles.venues(profileName));
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch venues:', error);
+      throw error;
+    }
+  },
+
+  createVenue: async (venueData) => {
+    try {
+      const formattedData = {
+        name: String(venueData.name),
+        description: String(venueData.description || ''),
+        media: Array.isArray(venueData.media) 
+          ? venueData.media.map(img => ({
+              url: typeof img === 'string' ? img : img.url,
+              alt: typeof img === 'string' ? `Image of ${venueData.name}` : img.alt
+            }))
+          : [],
+        price: Number(venueData.price),
+        maxGuests: Number(venueData.maxGuests),
+        rating: 0,
+        meta: {
+          wifi: Boolean(venueData.meta?.wifi),
+          parking: Boolean(venueData.meta?.parking),
+          breakfast: Boolean(venueData.meta?.breakfast),
+          pets: Boolean(venueData.meta?.pets)
+        },
+        location: {
+          address: String(venueData.location?.address || ''),
+          city: String(venueData.location?.city || ''),
+          zip: String(venueData.location?.zip || ''),
+          country: String(venueData.location?.country || ''),
+          continent: String(venueData.location?.continent || ''),
+          lat: 0,
+          lng: 0
+        }
+      };
+
+      console.log('Formatted venue data:', formattedData);
+
+      const response = await apiClient(API_ROUTES.venues.base, {
+        method: 'POST',
+        body: JSON.stringify(formattedData)
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error('Create venue error details:', {
+        error,
+        message: error.message,
+        data: venueData
+      });
+      throw error;
+    }
+  },
+
+  updateVenue: async (id, venueData) => {
+    try {
+      const response = await apiClient(API_ROUTES.venues.byId(id), {
+        method: 'PUT',
+        body: JSON.stringify(venueData)
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Failed to update venue:', error);
+      throw error;
+    }
+  },
+
+  deleteVenue: async (id) => {
+    try {
+      await apiClient(API_ROUTES.venues.byId(id), {
+        method: 'DELETE'
+      });
+      return true;
+    } catch (error) {
+      console.error('Failed to delete venue:', error);
+      throw error;
+    }
+  },
+
+  getVenueBookings: async (id, userName) => {
+    try {
+      const response = await apiClient(API_ROUTES.profiles.bookings(userName));
+      
+      const venueBookings = response.data.filter(booking => booking.venue.id === id);
+      
+      return venueBookings;
+    } catch (error) {
+      console.error('Failed to fetch venue bookings:', error);
+      throw error;
+    }
+  }
 };
