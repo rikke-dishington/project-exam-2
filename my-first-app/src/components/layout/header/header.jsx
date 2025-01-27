@@ -1,81 +1,85 @@
-import { useState, useRef, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useUser } from '../../../contexts/UserContext';
-import { logout } from '../../../utils/api/auth';
+import { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useUser } from '../../../context/UserContext';
+import { FaUser, FaSignOutAlt } from 'react-icons/fa';
+import { BsHouseDoor } from 'react-icons/bs';
 import {
   HeaderContainer,
+  Nav,
   Logo,
-  NavLinks,
-  NavLink,
-  AccountDropdown,
-  DropdownContent,
-  DropdownItem
+  AuthLinks,
+  AuthLink,
+  MenuContainer,
+  IconGroup,
+  DropdownMenu,
+  MenuItem,
+  UserAvatar
 } from './header.styles';
 
 function Header() {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
-  const { user, updateUser } = useUser();
+  const { user, logout } = useUser();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
   const navigate = useNavigate();
-  
+
   const handleLogout = () => {
     logout();
-    updateUser(null);
-    setIsOpen(false);
+    setIsMenuOpen(false);
     navigate('/');
   };
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
+  const closeMenu = () => setIsMenuOpen(false);
 
   return (
     <HeaderContainer>
-      <Link to="/">
-        <Logo>Holidaze</Logo>
-      </Link>
-      
-      <NavLinks>
-        {!user ? (
-          <>
-            <Link to="/login">
-              <NavLink variant="outline">Login</NavLink>
-            </Link>
-            <Link to="/register">
-              <NavLink variant="filled">Register</NavLink>
-            </Link>
-          </>
-        ) : (
-          <AccountDropdown ref={dropdownRef}>
-            <NavLink 
-              variant="filled"
-              onClick={() => setIsOpen(!isOpen)}
-            >
-              Account
-            </NavLink>
-            <DropdownContent isOpen={isOpen}>
-              <Link to="/account">
-                <DropdownItem onClick={() => setIsOpen(false)}>
-                  My Account
-                </DropdownItem>
-              </Link>
-              <DropdownItem onClick={handleLogout}>
-                Logout
-              </DropdownItem>
-            </DropdownContent>
-          </AccountDropdown>
-        )}
-      </NavLinks>
+      <Nav>
+        <Logo to="/">
+          Holidaze
+        </Logo>
+
+        <AuthLinks>
+          {user ? (
+            <MenuContainer>
+              <IconGroup onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                <UserAvatar>
+                  {user.avatar ? (
+                    <img src={user.avatar} alt={user.name} />
+                  ) : (
+                    <FaUser />
+                  )}
+                </UserAvatar>
+                <span>{user.name}</span>
+              </IconGroup>
+
+              <DropdownMenu isOpen={isMenuOpen} onClick={(e) => e.stopPropagation()}>
+                <MenuItem as={Link} to="/profile" onClick={closeMenu}>
+                  <FaUser />
+                  Profile
+                </MenuItem>
+                <MenuItem as={Link} to="/bookings" onClick={closeMenu}>
+                  <BsHouseDoor />
+                  My Bookings
+                </MenuItem>
+                {user?.venueManager && (
+                  <MenuItem as={Link} to="/manage-venues" onClick={closeMenu}>
+                    <BsHouseDoor />
+                    Manage Venues
+                  </MenuItem>
+                )}
+                <MenuItem as="button" onClick={handleLogout}>
+                  <FaSignOutAlt />
+                  Logout
+                </MenuItem>
+              </DropdownMenu>
+            </MenuContainer>
+          ) : (
+            <>
+              <AuthLink to="/login">Login</AuthLink>
+              <AuthLink to="/register" $primary>Register</AuthLink>
+            </>
+          )}
+        </AuthLinks>
+      </Nav>
     </HeaderContainer>
   );
 }

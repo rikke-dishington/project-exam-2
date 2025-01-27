@@ -1,13 +1,17 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { UserProvider, RequireAuth } from './context/UserContext'; // Updated path
+import { UserProvider, RequireAuth } from './context/UserContext';
 import { ThemeProvider } from 'styled-components';
 import { GlobalStyle } from './styles/globalStyles';
 import { theme } from './styles/theme';
+import Layout from './components/layout/Layout/Layout';
 
 // Component imports
 import Venues from './pages/venues/venues';
 import Register from './pages/register/register';
 import Login from './pages/login/login';
+import Profile from './pages/profile/profile';
+import Bookings from './pages/bookings/bookings';
+import ManageVenues from './pages/manage-venues/manage-venues';
 
 function App() {
   return (
@@ -15,12 +19,38 @@ function App() {
       <ThemeProvider theme={theme}>
         <UserProvider>
           <GlobalStyle />
-          <Routes>
-            <Route path="/" element={<Navigate to="/venues" replace />} />
-            <Route path="/venues" element={<Venues />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
-          </Routes>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<Navigate to="/venues" replace />} />
+              <Route path="/venues" element={<Venues />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/login" element={<Login />} />
+              <Route 
+                path="/profile" 
+                element={
+                  <RequireAuth>
+                    <Profile />
+                  </RequireAuth>
+                } 
+              />
+              <Route 
+                path="/bookings" 
+                element={
+                  <RequireAuth>
+                    <Bookings />
+                  </RequireAuth>
+                } 
+              />
+              <Route 
+                path="/manage-venues" 
+                element={
+                  <RequireAuth>
+                    <ManageVenues />
+                  </RequireAuth>
+                } 
+              />
+            </Routes>
+          </Layout>
         </UserProvider>
       </ThemeProvider>
     </BrowserRouter>
