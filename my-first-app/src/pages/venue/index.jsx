@@ -6,9 +6,10 @@ import {
   FaCheck,
   FaTimes,
   FaChevronLeft,
-  FaChevronRight
+  FaChevronRight,
+  FaUser
 } from 'react-icons/fa';
-import { getVenueById } from '../../utils/api/venues';
+import { venueApi } from '../../utils/api/venues';
 import useBookingStore from '../../stores/bookingStore';
 import BookingForm from '../../components/bookings/BookingForm';
 import BookingSummaryModal from '../../components/bookings/BookingSummaryModal';
@@ -36,8 +37,13 @@ import {
   FacilityIcon,
   LoadingSpinner,
   ErrorMessage,
-  AddressInfo
-} from './venue.styles';
+  AddressInfo,
+  HostSection,
+  HostInfo,
+  HostAvatar,
+  HostName,
+  HostStats
+} from './index.styles';
 
 function Venue() {
   const { id } = useParams();
@@ -52,7 +58,7 @@ function Venue() {
       try {
         setIsLoading(true);
         setError(null);
-        const data = await getVenueById(id);
+        const data = await venueApi.getById(id);
         setVenue(data);
       } catch (err) {
         setError(err.message);
@@ -77,8 +83,11 @@ function Venue() {
   ];
 
   const images = venue.media && venue.media.length > 0
-    ? venue.media.map(url => ({ url }))
-    : [{ url: 'https://placehold.co/600x400?text=No+Image+Available' }];
+    ? venue.media
+    : [{ 
+        url: 'https://placehold.co/600x400?text=No+Image+Available',
+        alt: 'No image available'
+      }];
 
   const handlePrevious = () => {
     setCurrentImageIndex((prev) => 
@@ -98,7 +107,7 @@ function Venue() {
         <ImageWrapper>
           <VenueImage 
             src={images[currentImageIndex].url} 
-            alt={`Venue image ${currentImageIndex + 1}`}
+            alt={images[currentImageIndex].alt}
           />
           {images.length > 1 && (
             <>
@@ -165,6 +174,27 @@ function Venue() {
               <p>{venue.location.city}, {venue.location.zip}</p>
               <p>{venue.location.country}</p>
             </AddressInfo>
+          </Section>
+
+          <Section>
+            <SectionTitle>Host</SectionTitle>
+            <HostSection>
+              <HostInfo>
+                <HostAvatar>
+                  {venue.owner?.avatar?.url ? (
+                    <img 
+                      src={venue.owner.avatar.url} 
+                      alt={venue.owner.avatar.alt || `${venue.owner.name}'s avatar`} 
+                    />
+                  ) : (
+                    <FaUser />
+                  )}
+                </HostAvatar>
+                <div>
+                  <HostName>{venue.owner?.name || 'Anonymous Host'}</HostName>
+                </div>
+              </HostInfo>
+            </HostSection>
           </Section>
         </LeftColumn>
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { FaSearch, FaTimes, FaFilter } from 'react-icons/fa';
 import { venueApi } from '../../utils/api';
 import VenueCard from '../../components/venues/VenueCard';
@@ -29,6 +29,7 @@ import Filters from '../../components/venues/Filters/Filters';
 import FilterDrawer from '../../components/venues/FilterDrawer/FilterDrawer';
 
 function Venues() {
+  const navigate = useNavigate();
   const [venues, setVenues] = useState([]);
   const [sortedVenues, setSortedVenues] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -263,6 +264,7 @@ function Venues() {
             <VenueCard 
               key={venue.id} 
               venue={venue} 
+              onClick={() => navigate(`/venue/${venue.id}`)}
             />
           ))}
         </Grid>

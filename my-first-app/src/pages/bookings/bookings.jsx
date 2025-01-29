@@ -6,7 +6,6 @@ function Bookings() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // TODO: Fetch bookings
     setLoading(false);
   }, []);
 

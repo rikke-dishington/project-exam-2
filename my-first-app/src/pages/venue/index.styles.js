@@ -9,6 +9,7 @@ export const VenueContainer = styled.main`
 export const ImageSection = styled.section`
   width: 100%;
   margin-bottom: 2rem;
+  margin-top: 2rem;
 `;
 
 export const ImageWrapper = styled.div`
@@ -102,6 +103,7 @@ export const RightColumn = styled.div`
 `;
 
 export const VenueHeader = styled.header`
+  margin-top: 1rem;
   margin-bottom: 2rem;
 `;
 
@@ -199,4 +201,45 @@ export const ErrorMessage = styled.div`
   text-align: center;
   padding: 2rem;
   color: ${({ theme }) => theme.colors.error};
+`;
+
+export const HostSection = styled.div`
+  padding: 1.5rem;
+  background: ${({ theme }) => theme.colors.background.secondary};
+  border-radius: 8px;
+`;
+
+export const HostInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+`;
+
+export const HostAvatar = styled.div`
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: ${({ theme }) => theme.colors.background.primary};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  svg {
+    width: 32px;
+    height: 32px;
+    color: ${({ theme }) => theme.colors.text.secondary};
+  }
+`;
+
+export const HostName = styled.h3`
+  margin: 0;
+  font-size: 1.2rem;
+  color: ${({ theme }) => theme.colors.text.primary};
 `;

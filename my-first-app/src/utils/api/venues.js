@@ -8,8 +8,13 @@ export const venueApi = {
   },
 
   getById: async (id) => {
-    const response = await apiClient(API_ROUTES.venues.byId(id));
-    return response.data;
+    try {
+      const response = await apiClient(`${API_ROUTES.venues.byId(id)}?_owner=true&_bookings=true`);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch venue:', error);
+      throw error;
+    }
   },
 
   search: async (query) => {
