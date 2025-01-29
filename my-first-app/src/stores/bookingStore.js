@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { createBooking } from '../utils/api/bookings';
+import { bookingApi } from '../utils/api/bookings';
 
 const useBookingStore = create((set, get) => ({
   // Booking state
@@ -9,24 +9,30 @@ const useBookingStore = create((set, get) => ({
   isLoading: false,
 
   // Booking actions
-  setBookingDates: (startDate, endDate) => {
-    const current = get().currentBooking;
-    set({ 
-      currentBooking: { 
-        ...current, 
-        dateFrom: startDate, 
-        dateTo: endDate 
-      } 
-    });
+  setBookingDates: (dateFrom, dateTo) => {
+    set((state) => ({
+      currentBooking: {
+        ...state.currentBooking,
+        dateFrom,
+        dateTo
+      }
+    }));
   },
 
   setGuests: (guests) => {
-    const current = get().currentBooking;
-    set({ 
-      currentBooking: { 
-        ...current, 
-        guests 
-      } 
+    console.log('Setting guests to:', guests); // Debug log
+    set((state) => {
+      const newBooking = {
+        ...state.currentBooking,
+        guests: Number(guests) // Ensure guests is a number
+      };
+      console.log('New booking state:', newBooking); // Debug log
+      return {
+        currentBooking: {
+          ...state.currentBooking,
+          guests: Number(guests)
+        }
+      };
     });
   },
 
@@ -34,13 +40,12 @@ const useBookingStore = create((set, get) => ({
     set({
       currentBooking: {
         venueId: venue.id,
-        venueName: venue.name,
-        price: venue.price,
         dateFrom: null,
         dateTo: null,
         guests: 1,
-        maxGuests: venue.maxGuests
-      }
+        price: venue.price,
+      },
+      error: null
     });
   },
 
@@ -60,7 +65,7 @@ const useBookingStore = create((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      const response = await createBooking({
+      const response = await bookingApi.create({
         dateFrom: booking.dateFrom,
         dateTo: booking.dateTo,
         guests: booking.guests,

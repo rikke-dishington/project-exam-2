@@ -12,6 +12,7 @@ import Login from './pages/login/login';
 import Profile from './pages/profile/profile';
 import Bookings from './pages/bookings/bookings';
 import ManageVenues from './pages/manage-venues/manage-venues';
+import VenuePage from './pages/venue/index';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Navigate to="/venues" replace />} />
               <Route path="/venues" element={<Venues />} />
+              <Route path="/venue/:id" element={<VenuePage />} />
               <Route path="/register" element={<Register />} />
               <Route path="/login" element={<Login />} />
               <Route 
