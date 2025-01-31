@@ -10,7 +10,7 @@ import Venues from './pages/venues/venues';
 import Register from './pages/register/register';
 import Login from './pages/login/login';
 import Profile from './pages/profile/profile';
-import Bookings from './pages/bookings/bookings';
+import Bookings from './pages/bookings';
 import ManageVenues from './pages/manage-venues/manage-venues';
 import VenuePage from './pages/venue/index';
 
@@ -36,7 +36,7 @@ function App() {
                 } 
               />
               <Route 
-                path="/bookings" 
+                path="/profiles/:name/bookings"
                 element={
                   <RequireAuth>
                     <Bookings />

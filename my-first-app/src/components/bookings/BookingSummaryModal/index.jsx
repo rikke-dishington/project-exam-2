@@ -35,7 +35,7 @@ function BookingSummaryModal({ venue }) {
     try {
       await submitBooking();
       closeModal();
-      navigate('/bookings');
+      navigate(`/profiles/${user.name}/bookings`);
     } catch (err) {
       console.error('Booking failed:', err);
     }
