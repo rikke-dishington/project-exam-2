@@ -63,7 +63,7 @@ export const profilesApi = {
   },
 
   getBookings: (name) => {
-    return apiClient(API_ROUTES.profiles.bookings(name));
+    return apiClient(`${API_ROUTES.profiles.bookings(name)}?_venue=true`);
   },
 
   getVenues: (name) => {

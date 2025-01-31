@@ -127,6 +127,7 @@ export const API_ROUTES = {
   bookings: {
     base: '/holidaze/bookings',
     byId: (id) => `/holidaze/bookings/${id}`,
+    withVenue: (id) => `/holidaze/bookings/${id}?_venue=true`,
   },
 };
 

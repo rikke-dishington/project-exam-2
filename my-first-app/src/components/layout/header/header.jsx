@@ -56,7 +56,11 @@ function Header() {
                   <FaUser />
                   Profile
                 </MenuItem>
-                <MenuItem as={Link} to="/bookings" onClick={closeMenu}>
+                <MenuItem 
+                  as={Link} 
+                  to={`/profiles/${user.name}/bookings`} 
+                  onClick={closeMenu}
+                >
                   <BsHouseDoor />
                   My Bookings
                 </MenuItem>
