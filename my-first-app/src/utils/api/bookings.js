@@ -31,6 +31,6 @@ export const bookingApi = {
   },
 
   getVenueBookings: (venueId) => {
-    return apiClient(`${API_ROUTES.bookings.base}?venue=${venueId}`);
+    return apiClient(`${API_ROUTES.bookings.base}?_venue=true&venue=${venueId}`);
   },
 }; 

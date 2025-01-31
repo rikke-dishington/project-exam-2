@@ -12,8 +12,8 @@ export const venueApi = {
       if (!id || typeof id !== 'string') {
         throw new Error('Invalid venue ID');
       }
-      const response = await apiClient(`${API_ROUTES.venues.byId(id)}?_owner=true&_bookings=true`);
-      return response.data;
+      const response = await apiClient(`${API_ROUTES.venues.byId(id)}?_bookings=true&_customer=true`);
+      return response;
     } catch (error) {
       console.error('Failed to fetch venue:', error);
       throw error;

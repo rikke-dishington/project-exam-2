@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FaTimes, FaCalendar, FaUser, FaUsers } from 'react-icons/fa';
-import { useUser } from '../../../../context/UserContext';
+import { FaTimes, FaCalendar, FaUser } from 'react-icons/fa';
 import { venueApi } from '../../../../utils/api/venues';
 import {
   Modal,
@@ -19,7 +18,6 @@ import {
 } from './styles';
 
 function BookingsModal({ venue, onClose }) {
-  const { user } = useUser();
   const [bookings, setBookings] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -27,8 +25,11 @@ function BookingsModal({ venue, onClose }) {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const response = await venueApi.getVenueBookings(venue.id, user.name);
-        const sortedBookings = response.sort((a, b) => 
+        const response = await venueApi.getById(venue.id);
+        const venueData = response.data || response;
+        const bookingsData = venueData.bookings || [];
+        
+        const sortedBookings = bookingsData.sort((a, b) => 
           new Date(b.dateFrom) - new Date(a.dateFrom)
         );
         setBookings(sortedBookings);
@@ -41,7 +42,7 @@ function BookingsModal({ venue, onClose }) {
     };
 
     fetchBookings();
-  }, [venue.id, user.name]);
+  }, [venue.id]);
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -79,11 +80,8 @@ function BookingsModal({ venue, onClose }) {
                     <GuestInfo>
                       <FaUser />
                       <span>{booking.customer.name}</span>
+                      <span> • {booking.guests} guests</span>
                     </GuestInfo>
-                    <div className="guests">
-                      <FaUsers />
-                      <span>{booking.guests} guests</span>
-                    </div>
                   </BookingHeader>
                   <BookingDetails>
                     <DateRange>
