@@ -3,16 +3,16 @@ import { UserProvider, RequireAuth } from './context/UserContext';
 import { ThemeProvider } from 'styled-components';
 import { GlobalStyle } from './styles/globalStyles';
 import { theme } from './styles/theme';
-import Layout from './components/layout/Layout/Layout';
+import Layout from './components/layout/Layout';
 
 // Component imports
-import Venues from './pages/venues/venues';
-import Register from './pages/register/register';
-import Login from './pages/login/login';
-import Profile from './pages/profile/profile';
-import Bookings from './pages/bookings';
-import ManageVenues from './pages/manage-venues/manage-venues';
-import VenuePage from './pages/venue/index';
+import Venues from './features/venues/pages/venues';
+import Register from './features/auth/pages/register';
+import Login from './features/auth/pages/login';
+import Profile from './features/profile/pages/profile';
+import Bookings from './features/bookings/pages';
+import ManageVenues from './features/profile/pages/manage-venues';
+import VenuePage from './features/venues/pages/venue';
 
 function App() {
   return (

@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { profilesApi } from '../utils/api/profiles';
-import { initializeApiKey } from '../utils/api/config';
+import { profilesApi } from '../features/profile/api/profiles';
+import { initializeApiKey } from '../api/config';
 
 const UserContext = createContext();
 
@@ -60,7 +60,6 @@ export function UserProvider({ children }) {
   const updateProfile = async (data) => {
     try {
       const updatedProfile = await profilesApi.updateProfile(user.name, data);
-      console.log('Updated profile:', updatedProfile);
       
       setUser(prev => ({
         ...prev,
