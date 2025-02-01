@@ -16,21 +16,24 @@ function BookingSection({
   isDeleting,
   formatDate
 }) {
+  // Filter out bookings with invalid IDs
+  const validBookings = bookings.filter(booking => booking.id);
+
   return (
     <Section>
       <SectionHeader $past={isPast}>
         <h2>{title}</h2>
       </SectionHeader>
 
-      {bookings.length === 0 ? (
+      {validBookings.length === 0 ? (
         <NoBookingsMessage>
           <p>No {isPast ? 'past' : 'upcoming'} bookings</p>
         </NoBookingsMessage>
       ) : (
         <BookingsList>
-          {bookings.map(booking => (
+          {validBookings.map(booking => (
             <BookingCard
-              key={booking.id}
+              key={`booking-${booking.id}`}
               booking={booking}
               onEdit={onEdit}
               onDelete={onDelete}
@@ -48,10 +51,15 @@ BookingSection.propTypes = {
   title: PropTypes.string.isRequired,
   bookings: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.number.isRequired,
+      id: PropTypes.string.isRequired,
       venue: PropTypes.shape({
         name: PropTypes.string.isRequired,
-        media: PropTypes.arrayOf(PropTypes.string),
+        media: PropTypes.arrayOf(
+          PropTypes.shape({
+            url: PropTypes.string.isRequired,
+            alt: PropTypes.string
+          })
+        ),
         location: PropTypes.shape({
           city: PropTypes.string,
           country: PropTypes.string

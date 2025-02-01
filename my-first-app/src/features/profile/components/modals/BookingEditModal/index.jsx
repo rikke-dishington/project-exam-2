@@ -127,6 +127,7 @@ function EditBookingModal({ booking, onClose, onUpdate }) {
               value={formData.guests}
               onChange={handleChange}
               min="1"
+              max={booking.venue.maxGuests}
               required
             />
           </InputGroup>
@@ -160,7 +161,7 @@ function EditBookingModal({ booking, onClose, onUpdate }) {
 
 EditBookingModal.propTypes = {
   booking: PropTypes.shape({
-    id: PropTypes.number.isRequired,
+    id: PropTypes.string.isRequired,
     dateFrom: PropTypes.string.isRequired,
     dateTo: PropTypes.string.isRequired,
     guests: PropTypes.number.isRequired,

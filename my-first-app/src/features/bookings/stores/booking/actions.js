@@ -7,7 +7,8 @@ export const createBookingActions = (set, get) => ({
         ...state.currentBooking,
         dateFrom,
         dateTo
-      }
+      },
+      error: null
     }));
   },
 
@@ -16,7 +17,8 @@ export const createBookingActions = (set, get) => ({
       currentBooking: {
         ...state.currentBooking,
         guests: Number(guests)
-      }
+      },
+      error: null
     }));
   },
 
@@ -29,12 +31,21 @@ export const createBookingActions = (set, get) => ({
         guests: 1,
         price: venue.price,
       },
+      isModalOpen: false,
       error: null
     });
   },
 
-  openModal: () => set({ isModalOpen: true }),
-  closeModal: () => set({ isModalOpen: false }),
+  openModal: () => {
+    const { currentBooking } = get();
+    if (!currentBooking?.dateFrom || !currentBooking?.dateTo || !currentBooking?.guests) {
+      set({ error: 'Please select dates and number of guests' });
+      return;
+    }
+    set({ isModalOpen: true, error: null });
+  },
+  
+  closeModal: () => set({ isModalOpen: false, error: null }),
 
   submitBooking: async () => {
     const booking = get().currentBooking;
@@ -48,8 +59,8 @@ export const createBookingActions = (set, get) => ({
 
     try {
       const response = await bookingApi.create({
-        dateFrom: booking.dateFrom,
-        dateTo: booking.dateTo,
+        dateFrom: booking.dateFrom.toISOString(),
+        dateTo: booking.dateTo.toISOString(),
         guests: booking.guests,
         venueId: booking.venueId
       });
@@ -57,7 +68,8 @@ export const createBookingActions = (set, get) => ({
       set({ 
         currentBooking: null, 
         isModalOpen: false, 
-        isLoading: false 
+        isLoading: false,
+        error: null
       });
 
       return response;
@@ -74,7 +86,8 @@ export const createBookingActions = (set, get) => ({
     set({ 
       currentBooking: null, 
       isModalOpen: false, 
-      error: null 
+      error: null,
+      isLoading: false
     });
   }
 });

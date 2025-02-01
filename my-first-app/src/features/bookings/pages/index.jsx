@@ -22,6 +22,25 @@ function Bookings() {
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const processBookingData = (booking) => {
+    if (!booking.id) {
+      console.error('Missing booking ID:', booking);
+    }
+
+    return {
+      ...booking,
+      guests: Number(booking.guests) || 1,
+      venue: {
+        ...booking.venue,
+        media: booking.venue.media?.map(media => 
+          typeof media === 'string' 
+            ? { url: media, alt: booking.venue.name } 
+            : media
+        ) || []
+      }
+    };
+  };
+
   useEffect(() => {
     const fetchBookings = async () => {
       try {
@@ -35,10 +54,12 @@ function Bookings() {
         const now = new Date();
         
         const upcomingBookings = bookingsData
+          .map(processBookingData)
           .filter(booking => new Date(booking.dateFrom) >= now)
           .sort((a, b) => new Date(a.dateFrom) - new Date(b.dateFrom));
           
         const pastBookings = bookingsData
+          .map(processBookingData)
           .filter(booking => new Date(booking.dateFrom) < now)
           .sort((a, b) => new Date(b.dateFrom) - new Date(a.dateFrom));
           
@@ -86,10 +107,12 @@ function Bookings() {
       const now = new Date();
       
       const upcomingBookings = bookingsData
+        .map(processBookingData)
         .filter(booking => new Date(booking.dateFrom) >= now)
         .sort((a, b) => new Date(a.dateFrom) - new Date(b.dateFrom));
         
       const pastBookings = bookingsData
+        .map(processBookingData)
         .filter(booking => new Date(booking.dateFrom) < now)
         .sort((a, b) => new Date(b.dateFrom) - new Date(a.dateFrom));
         
@@ -113,10 +136,12 @@ function Bookings() {
     const now = new Date();
     
     const upcomingBookings = bookingsData
+      .map(processBookingData)
       .filter(booking => new Date(booking.dateFrom) >= now)
       .sort((a, b) => new Date(a.dateFrom) - new Date(b.dateFrom));
       
     const pastBookings = bookingsData
+      .map(processBookingData)
       .filter(booking => new Date(booking.dateFrom) < now)
       .sort((a, b) => new Date(b.dateFrom) - new Date(a.dateFrom));
       
