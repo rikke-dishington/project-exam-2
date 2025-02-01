@@ -1,0 +1,165 @@
+import { useState, useEffect } from 'react';
+import { useUser } from '../../../../context/UserContext';
+import { venueApi } from '../../../venues/api/venues';
+import {
+  ManageVenueHeader,
+  ManageVenueCard,
+  VenueFormModal,
+  VenueDeleteModal,
+  VenueBookingsModal
+} from '../../components';
+import {
+  Container,
+  VenueGrid,
+  LoadingSpinner,
+  ErrorMessage,
+  NoVenuesMessage
+} from './styles';
+
+function ManageVenues() {
+  const { user } = useUser();
+  const [venues, setVenues] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedVenue, setSelectedVenue] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isBookingsModalOpen, setIsBookingsModalOpen] = useState(false);
+  const [message, setMessage] = useState(null);
+
+  useEffect(() => {
+    const fetchVenues = async () => {
+      try {
+        const response = await venueApi.getVenuesByProfile(user.name);
+        setVenues(response);
+      } catch (err) {
+        setError('Failed to load venues');
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchVenues();
+  }, [user.name]);
+
+  const handleCreateVenue = () => {
+    setSelectedVenue(null);
+    setIsModalOpen(true);
+  };
+
+  const handleEditVenue = (venue) => {
+    setSelectedVenue(venue);
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteVenue = (venue) => {
+    setSelectedVenue(venue);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleViewBookings = (venue) => {
+    setSelectedVenue(venue);
+    setIsBookingsModalOpen(true);
+  };
+
+  const handleSaveVenue = async (venueData) => {
+    try {
+      let updatedVenue;
+      
+      if (typeof venueData !== 'object' || venueData === null) {
+        throw new Error('Invalid venue data format');
+      }
+
+      if (selectedVenue) {
+        updatedVenue = await venueApi.updateVenue(selectedVenue.id, venueData);
+      } else {
+        updatedVenue = await venueApi.createVenue(venueData);
+      }
+
+      setVenues(prev => 
+        selectedVenue 
+          ? prev.map(v => v.id === updatedVenue.id ? updatedVenue : v)
+          : [...prev, updatedVenue]
+      );
+      
+      setIsModalOpen(false);
+      setMessage({
+        type: 'success',
+        text: `Venue successfully ${selectedVenue ? 'updated' : 'created'}`
+      });
+    } catch (err) {
+      console.error('Save venue error:', err);
+      setError(err.message || 'Failed to save venue');
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await venueApi.deleteVenue(selectedVenue.id);
+      setVenues(venues.filter(v => v.id !== selectedVenue.id));
+      setIsDeleteModalOpen(false);
+      setMessage({
+        type: 'success',
+        text: 'Venue successfully deleted'
+      });
+    } catch (err) {
+      setError(err.message || 'Failed to delete venue');
+    }
+  };
+
+  if (isLoading) {
+    return <LoadingSpinner>Loading venues...</LoadingSpinner>;
+  }
+
+  return (
+    <Container>
+      <ManageVenueHeader onCreateClick={handleCreateVenue} />
+
+      {error && <ErrorMessage>{error}</ErrorMessage>}
+
+      {venues.length === 0 ? (
+        <NoVenuesMessage>
+          You haven't created any venues yet. Click the button above to create your first venue!
+        </NoVenuesMessage>
+      ) : (
+        <VenueGrid>
+          {venues.map(venue => (
+            <ManageVenueCard
+              key={venue.id}
+              venue={venue}
+              onEdit={handleEditVenue}
+              onDelete={handleDeleteVenue}
+              onViewBookings={handleViewBookings}
+            />
+          ))}
+        </VenueGrid>
+      )}
+
+      {isModalOpen && (
+        <VenueFormModal
+          venue={selectedVenue}
+          onClose={() => setIsModalOpen(false)}
+          onSave={handleSaveVenue}
+        />
+      )}
+
+      {isDeleteModalOpen && (
+        <VenueDeleteModal
+          venueName={selectedVenue?.name}
+          onClose={() => setIsDeleteModalOpen(false)}
+          onConfirm={handleConfirmDelete}
+        />
+      )}
+
+      {isBookingsModalOpen && (
+        <VenueBookingsModal
+          venue={selectedVenue}
+          onClose={() => setIsBookingsModalOpen(false)}
+        />
+      )}
+    </Container>
+  );
+}
+
+export default ManageVenues; 
