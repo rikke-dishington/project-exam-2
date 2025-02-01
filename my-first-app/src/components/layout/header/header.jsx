@@ -18,6 +18,7 @@ import {
 
 function Header() {
   const { user, logout } = useUser();
+  const isVenueManager = user?.venueManager || false;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -42,17 +43,16 @@ function Header() {
             <MenuContainer>
               <IconGroup onClick={() => setIsMenuOpen(!isMenuOpen)}>
                 <UserAvatar>
-                  {user.avatar ? (
-                    <img src={user.avatar} alt={user.name} />
-                  ) : (
-                    <FaUser />
-                  )}
+                  <FaUser />
                 </UserAvatar>
                 <span>{user.name}</span>
               </IconGroup>
 
               <DropdownMenu isOpen={isMenuOpen} onClick={(e) => e.stopPropagation()}>
-                <MenuItem as={Link} to="/profile" onClick={closeMenu}>
+                <MenuItem 
+                  as={Link} 
+                  to={`/profiles/${user.name}`} 
+                  onClick={closeMenu}>
                   <FaUser />
                   Profile
                 </MenuItem>
@@ -64,7 +64,7 @@ function Header() {
                   <BsHouseDoor />
                   My Bookings
                 </MenuItem>
-                {user?.venueManager && (
+                {isVenueManager && (
                   <MenuItem as={Link} to="/manage-venues" onClick={closeMenu}>
                     <BsHouseDoor />
                     Manage Venues

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
 import { FaUser, FaEdit, FaCamera } from 'react-icons/fa';
+import { profilesApi } from '../../utils/api/profiles';
 import {
   Container,
   ProfileHeader,
@@ -23,7 +25,8 @@ import {
 } from './profile.styles';
 
 function Profile() {
-  const { user, updateProfile } = useUser();
+  const { name } = useParams();
+  const { user, updateProfile, setUser } = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -34,6 +37,38 @@ function Profile() {
     venueManager: user?.venueManager || false
   }));
 
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await profilesApi.getProfile(name);
+        const profileData = response.data || response;
+        
+        // Update form data
+        setFormData({
+          avatar: profileData.avatar?.url || '',
+          banner: profileData.banner?.url || '',
+          bio: profileData.bio || '',
+          venueManager: profileData.venueManager || false
+        });
+
+        // Update user context
+        setUser(prev => ({
+          ...prev,
+          ...profileData,
+          venueManager: profileData.venueManager || false
+        }));
+      } catch (err) {
+        console.error('Failed to fetch profile:', err);
+        setError('Failed to load profile data');
+      }
+    };
+
+    // Only fetch if viewing a different profile or if user data is incomplete
+    if (name && (name !== user?.name || !user?.venueManager === undefined)) {
+      fetchProfile();
+    }
+  }, [name, user?.name]);
+
   // Reset form data when user changes
   useEffect(() => {
     setFormData({
@@ -42,6 +77,8 @@ function Profile() {
       bio: user?.bio || '',
       venueManager: user?.venueManager || false
     });
+    console.log('Current user data:', user);
+    console.log('venueManager status:', user?.venueManager);
   }, [user]);
 
   // Add form validation
