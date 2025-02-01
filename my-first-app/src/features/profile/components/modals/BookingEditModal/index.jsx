@@ -1,7 +1,7 @@
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 import { FaTimes, FaCalendar, FaUser } from 'react-icons/fa';
 import { bookingApi } from '../../../../bookings/api/bookings';
-import Calendar from '../../../../../components/common/Calendar';
 import {
   Modal,
   ModalContent,
@@ -157,5 +157,21 @@ function EditBookingModal({ booking, onClose, onUpdate }) {
     </Modal>
   );
 }
+
+EditBookingModal.propTypes = {
+  booking: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    dateFrom: PropTypes.string.isRequired,
+    dateTo: PropTypes.string.isRequired,
+    guests: PropTypes.number.isRequired,
+    venue: PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      price: PropTypes.number.isRequired,
+      maxGuests: PropTypes.number.isRequired
+    }).isRequired
+  }).isRequired,
+  onClose: PropTypes.func.isRequired,
+  onUpdate: PropTypes.func.isRequired
+};
 
 export default EditBookingModal; 

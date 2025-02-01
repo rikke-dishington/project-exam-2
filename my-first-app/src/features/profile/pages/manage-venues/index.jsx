@@ -33,8 +33,7 @@ function ManageVenues() {
         const response = await venueApi.getVenuesByProfile(user.name);
         setVenues(response);
       } catch (err) {
-        setError('Failed to load venues');
-        console.error(err);
+        setError(err.message || 'Failed to load venues');
       } finally {
         setIsLoading(false);
       }
@@ -89,7 +88,6 @@ function ManageVenues() {
         text: `Venue successfully ${selectedVenue ? 'updated' : 'created'}`
       });
     } catch (err) {
-      console.error('Save venue error:', err);
       setError(err.message || 'Failed to save venue');
     }
   };
@@ -117,6 +115,11 @@ function ManageVenues() {
       <ManageVenueHeader onCreateClick={handleCreateVenue} />
 
       {error && <ErrorMessage>{error}</ErrorMessage>}
+      {message && (
+        <ErrorMessage $success={message.type === 'success'}>
+          {message.text}
+        </ErrorMessage>
+      )}
 
       {venues.length === 0 ? (
         <NoVenuesMessage>

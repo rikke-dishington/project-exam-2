@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { useUser } from '../../../../context/UserContext';
 import { FaEdit } from 'react-icons/fa';
@@ -27,34 +27,33 @@ function Profile() {
     venueManager: user?.venueManager || false
   }));
 
+  const fetchProfile = useCallback(async () => {
+    try {
+      const response = await profilesApi.getProfile(name);
+      const profileData = response.data || response;
+      
+      setFormData({
+        avatar: profileData.avatar?.url || '',
+        banner: profileData.banner?.url || '',
+        bio: profileData.bio || '',
+        venueManager: profileData.venueManager || false
+      });
+
+      setUser(prev => ({
+        ...prev,
+        ...profileData,
+        venueManager: profileData.venueManager || false
+      }));
+    } catch (err) {
+      setError(err.message || 'Failed to load profile data');
+    }
+  }, [name, setUser]);
+
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const response = await profilesApi.getProfile(name);
-        const profileData = response.data || response;
-        
-        setFormData({
-          avatar: profileData.avatar?.url || '',
-          banner: profileData.banner?.url || '',
-          bio: profileData.bio || '',
-          venueManager: profileData.venueManager || false
-        });
-
-        setUser(prev => ({
-          ...prev,
-          ...profileData,
-          venueManager: profileData.venueManager || false
-        }));
-      } catch (err) {
-        console.error('Failed to fetch profile:', err);
-        setError('Failed to load profile data');
-      }
-    };
-
     if (name && (name !== user?.name || !user?.venueManager === undefined)) {
       fetchProfile();
     }
-  }, [name, user?.name, setUser]);
+  }, [name, user?.name, fetchProfile]);
 
   useEffect(() => {
     setFormData({
@@ -65,7 +64,16 @@ function Profile() {
     });
   }, [user]);
 
-  const validateForm = (data) => {
+  const isValidUrl = useCallback((string) => {
+    try {
+      new URL(string);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }, []);
+
+  const validateForm = useCallback((data) => {
     const errors = [];
     
     if (data.avatar && !isValidUrl(data.avatar)) {
@@ -79,7 +87,7 @@ function Profile() {
     }
 
     return errors;
-  };
+  }, [isValidUrl]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -108,15 +116,6 @@ function Profile() {
       setError(err.message || 'Failed to update profile');
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const isValidUrl = (string) => {
-    try {
-      new URL(string);
-      return true;
-    } catch (_) {
-      return false;
     }
   };
 

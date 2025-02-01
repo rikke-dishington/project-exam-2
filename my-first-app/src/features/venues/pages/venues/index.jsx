@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { venueApi } from '../../api/venues';
 import {
@@ -29,74 +29,71 @@ function Venues() {
   });
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchVenues = async () => {
-      try {
-        setIsLoading(true);
-        const query = searchParams.get('q');
-        
-        if (query) {
-          const data = await venueApi.search(query);
-          setVenues(data);
-        } else {
-          const data = await venueApi.getAll();
-          setVenues(data);
-        }
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchVenues();
+  const fetchVenues = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const query = searchParams.get('q');
+      
+      const data = query 
+        ? await venueApi.search(query)
+        : await venueApi.getAll();
+      
+      setVenues(data);
+    } catch (err) {
+      setError(err.message || 'Failed to load venues');
+    } finally {
+      setIsLoading(false);
+    }
   }, [searchParams]);
 
   useEffect(() => {
-    const filterVenues = (venuesList) => {
-      return venuesList.filter(venue => {
-        if (venue.price > filters.maxPrice) {
-          return false;
-        }
+    fetchVenues();
+  }, [fetchVenues]);
 
-        if (filters.wifi && !venue.meta?.wifi) {
-          return false;
-        }
-        if (filters.parking && !venue.meta?.parking) {
-          return false;
-        }
-        if (filters.breakfast && !venue.meta?.breakfast) {
-          return false;
-        }
-        if (filters.pets && !venue.meta?.pets) {
-          return false;
-        }
+  const filterVenues = useCallback((venuesList) => {
+    return venuesList.filter(venue => {
+      if (venue.price > filters.maxPrice) {
+        return false;
+      }
 
-        return true;
-      });
-    };
+      if (filters.wifi && !venue.meta?.wifi) {
+        return false;
+      }
+      if (filters.parking && !venue.meta?.parking) {
+        return false;
+      }
+      if (filters.breakfast && !venue.meta?.breakfast) {
+        return false;
+      }
+      if (filters.pets && !venue.meta?.pets) {
+        return false;
+      }
 
-    const filteredVenues = filterVenues(venues);
+      return true;
+    });
+  }, [filters]);
 
-    let sortedResults = [...filteredVenues];
+  const sortVenues = useCallback((venuesList) => {
+    const sortedResults = [...venuesList];
     switch (sortBy) {
       case 'price_low':
-        sortedResults.sort((a, b) => a.price - b.price);
-        break;
+        return sortedResults.sort((a, b) => a.price - b.price);
       case 'price_high':
-        sortedResults.sort((a, b) => b.price - a.price);
-        break;
+        return sortedResults.sort((a, b) => b.price - a.price);
       case 'rating':
-        sortedResults.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-        break;
+        return sortedResults.sort((a, b) => (b.rating || 0) - (a.rating || 0));
       default:
-        break;
+        return sortedResults;
     }
+  }, [sortBy]);
 
+  useEffect(() => {
+    const filteredVenues = filterVenues(venues);
+    const sortedResults = sortVenues(filteredVenues);
     setSortedVenues(sortedResults);
-  }, [venues, filters, sortBy]);
+  }, [venues, filterVenues, sortVenues]);
 
-  const handleSort = (value) => {
+  const handleSort = useCallback((value) => {
     setSortBy(value);
     setSearchParams(prev => {
       if (value === 'default') {
@@ -106,22 +103,22 @@ function Venues() {
       }
       return prev;
     });
-  };
+  }, [setSearchParams]);
 
-  const handleSearch = (term) => {
+  const handleSearch = useCallback((term) => {
     if (term.trim()) {
       setSearchParams({ q: term.trim(), ...(sortBy !== 'default' && { sort: sortBy }) });
     } else {
       setSearchParams(sortBy !== 'default' ? { sort: sortBy } : {});
     }
-  };
+  }, [setSearchParams, sortBy]);
 
-  const handleClearSearch = () => {
+  const handleClearSearch = useCallback(() => {
     setSearchTerm('');
     setSearchParams(sortBy !== 'default' ? { sort: sortBy } : {});
-  };
+  }, [setSearchParams, sortBy]);
 
-  const handleFilterChange = (newFilters) => {
+  const handleFilterChange = useCallback((newFilters) => {
     setFilters(newFilters);
     setSearchParams(prev => {
       Object.entries(newFilters).forEach(([key, value]) => {
@@ -135,12 +132,16 @@ function Venues() {
       });
       return prev;
     });
-  };
+  }, [setSearchParams]);
 
   const hasActiveFilters = Object.entries(filters).some(([key, value]) => {
     if (key === 'maxPrice') return value !== 1000;
     return value === true;
   });
+
+  const handleVenueClick = useCallback((id) => {
+    navigate(`/venue/${id}`);
+  }, [navigate]);
 
   if (isLoading) {
     return (
@@ -160,6 +161,23 @@ function Venues() {
             : 'Loading venues...'
           }
         />
+      </Container>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container>
+        <Header>
+          <Title>Find your perfect stay</Title>
+          <VenueSearchBar 
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            onSearch={handleSearch}
+            onClear={handleClearSearch}
+          />
+        </Header>
+        <div className="error-message">{error}</div>
       </Container>
     );
   }
@@ -201,7 +219,7 @@ function Venues() {
 
       <VenueGrid 
         venues={sortedVenues}
-        onVenueClick={(id) => navigate(`/venue/${id}`)}
+        onVenueClick={handleVenueClick}
         searchQuery={searchParams.get('q')}
       />
     </Container>
