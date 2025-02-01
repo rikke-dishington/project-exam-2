@@ -9,7 +9,6 @@ export function UserProvider({ children }) {
   const [isInitialized, setIsInitialized] = useState(false);
   const [error, setError] = useState(null);
   const [user, setUser] = useState(() => {
-    // Check localStorage on initial load
     const savedUser = localStorage.getItem('user');
     const parsedUser = savedUser ? JSON.parse(savedUser) : null;
     return parsedUser ? {
@@ -19,37 +18,69 @@ export function UserProvider({ children }) {
   });
   const navigate = useNavigate();
 
+  const fetchUserProfile = async (username) => {
+    try {
+      const response = await profilesApi.getProfile(username);
+      const profileData = response.data || response;
+      return profileData;
+    } catch (error) {
+      console.error('Failed to fetch profile:', error);
+      return null;
+    }
+  };
+
   const updateUser = useCallback(async (userData) => {
     if (userData) {
       try {
-        // Fetch complete profile data after login
-        const response = await profilesApi.getProfile(userData.name);
-        const profileData = response.data || response;
-        
-        // Combine login data with profile data
-        const completeUserData = {
+        // First store the token and basic user data
+        const basicUserData = {
           ...userData,
-          ...profileData,
-          venueManager: profileData.venueManager || false
+          venueManager: false // Default value until we get the complete profile
         };
-        
-        // Store in state and localStorage
-        setUser(completeUserData);
-        localStorage.setItem('user', JSON.stringify(completeUserData));
+        localStorage.setItem('token', userData.accessToken);
+        setUser(basicUserData);
+        localStorage.setItem('user', JSON.stringify(basicUserData));
+
+        // Initialize API key with the token
+        const apiKey = await initializeApiKey();
+        if (!apiKey) {
+          console.warn('Could not initialize API key, will retry later');
+        }
+
+        // Try to fetch the profile even if API key initialization failed
+        try {
+          const profileData = await fetchUserProfile(userData.name);
+          if (profileData) {
+            const completeUserData = {
+              ...userData,
+              ...profileData,
+              venueManager: profileData.venueManager || false
+            };
+            
+            setUser(completeUserData);
+            localStorage.setItem('user', JSON.stringify(completeUserData));
+          }
+        } catch (profileError) {
+          console.error('Failed to fetch profile:', profileError);
+        }
       } catch (error) {
-        console.error('Failed to fetch complete profile:', error);
-        // Still update with basic user data if profile fetch fails
-        setUser(userData);
-        localStorage.setItem('user', JSON.stringify(userData));
+        console.error('Failed to complete user setup:', error);
+        // Keep the basic user data if setup fails
+        const basicUserData = {
+          ...userData,
+          venueManager: false
+        };
+        setUser(basicUserData);
+        localStorage.setItem('user', JSON.stringify(basicUserData));
       }
     }
   }, []);
 
   const clearUser = useCallback(() => {
-    // Clear both state and localStorage
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    localStorage.removeItem('noroff_api_key');
   }, []);
 
   const logout = useCallback(() => {
@@ -70,7 +101,6 @@ export function UserProvider({ children }) {
         venueManager: updatedProfile.venueManager
       }));
 
-      // Store updated user data in localStorage
       localStorage.setItem('user', JSON.stringify({
         ...user,
         ...updatedProfile,
@@ -87,17 +117,46 @@ export function UserProvider({ children }) {
     }
   };
 
+  // Initialize API key on mount and when user changes
   useEffect(() => {
     let mounted = true;
+    let retryTimeout;
 
     const init = async () => {
       try {
-        await initializeApiKey();
+        if (user) {
+          // First ensure we have an API key
+          const apiKey = await initializeApiKey();
+          
+          if (!apiKey && mounted) {
+            // If API key initialization failed, schedule a retry
+            retryTimeout = setTimeout(init, 5000);
+            return;
+          }
+
+          // Then fetch the profile
+          if (mounted) {
+            try {
+              const profileData = await fetchUserProfile(user.name);
+              if (profileData && mounted) {
+                const updatedUser = {
+                  ...user,
+                  ...profileData,
+                  venueManager: profileData.venueManager || false
+                };
+                setUser(updatedUser);
+                localStorage.setItem('user', JSON.stringify(updatedUser));
+              }
+            } catch (profileError) {
+              console.error('Failed to fetch profile:', profileError);
+            }
+          }
+        }
         if (mounted) {
           setIsInitialized(true);
         }
       } catch (err) {
-        console.error('Failed to initialize API key:', err);
+        console.error('Failed to initialize:', err);
         if (mounted) {
           setError('Failed to initialize application');
         }
@@ -108,15 +167,18 @@ export function UserProvider({ children }) {
 
     return () => {
       mounted = false;
+      if (retryTimeout) {
+        clearTimeout(retryTimeout);
+      }
     };
-  }, []);
+  }, [user?.name]); // Only re-run if username changes
 
-  if (!isInitialized) {
-    return <div>Loading...</div>; // Or your loading component
+  if (!isInitialized && user) {
+    return <div>Loading...</div>;
   }
 
   if (error) {
-    return <div>Error: {error}</div>; // Or your error component
+    return <div>Error: {error}</div>;
   }
 
   const isLoggedIn = !!user;

@@ -99,7 +99,7 @@ function Venue() {
         </RightColumn>
       </ContentWrapper>
 
-      <BookingSummaryModal />
+      <BookingSummaryModal venue={venue} />
     </VenueContainer>
   );
 }
