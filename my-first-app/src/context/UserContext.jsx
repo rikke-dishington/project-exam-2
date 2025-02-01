@@ -11,15 +11,37 @@ export function UserProvider({ children }) {
   const [user, setUser] = useState(() => {
     // Check localStorage on initial load
     const savedUser = localStorage.getItem('user');
-    return savedUser ? JSON.parse(savedUser) : null;
+    const parsedUser = savedUser ? JSON.parse(savedUser) : null;
+    return parsedUser ? {
+      ...parsedUser,
+      venueManager: parsedUser.venueManager || false
+    } : null;
   });
   const navigate = useNavigate();
 
-  const updateUser = useCallback((userData) => {
+  const updateUser = useCallback(async (userData) => {
     if (userData) {
-      // Store in state and localStorage
-      setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
+      try {
+        // Fetch complete profile data after login
+        const response = await profilesApi.getProfile(userData.name);
+        const profileData = response.data || response;
+        
+        // Combine login data with profile data
+        const completeUserData = {
+          ...userData,
+          ...profileData,
+          venueManager: profileData.venueManager || false
+        };
+        
+        // Store in state and localStorage
+        setUser(completeUserData);
+        localStorage.setItem('user', JSON.stringify(completeUserData));
+      } catch (error) {
+        console.error('Failed to fetch complete profile:', error);
+        // Still update with basic user data if profile fetch fails
+        setUser(userData);
+        localStorage.setItem('user', JSON.stringify(userData));
+      }
     }
   }, []);
 
@@ -35,26 +57,33 @@ export function UserProvider({ children }) {
     navigate('/login');
   }, [navigate, clearUser]);
 
-  const updateProfile = async (profileData) => {
+  const updateProfile = async (data) => {
     try {
-      const userName = user?.name || localStorage.getItem('userName');
-      if (!userName) {
-        throw new Error('User name not found');
-      }
-
-      console.log('Updating profile for:', userName); // Debug log
-      console.log('Profile data:', profileData); // Debug log
-
-      const updatedUser = await profilesApi.updateProfile(userName, profileData);
+      const updatedProfile = await profilesApi.updateProfile(user.name, data);
+      console.log('Updated profile:', updatedProfile);
       
-      // Update local storage and state with new user data
-      const newUserData = { ...user, ...updatedUser };
-      localStorage.setItem('user', JSON.stringify(newUserData));
-      setUser(newUserData);
-      
-      return updatedUser;
+      setUser(prev => ({
+        ...prev,
+        ...updatedProfile,
+        avatar: updatedProfile.avatar,
+        banner: updatedProfile.banner,
+        bio: updatedProfile.bio,
+        venueManager: updatedProfile.venueManager
+      }));
+
+      // Store updated user data in localStorage
+      localStorage.setItem('user', JSON.stringify({
+        ...user,
+        ...updatedProfile,
+        avatar: updatedProfile.avatar,
+        banner: updatedProfile.banner,
+        bio: updatedProfile.bio,
+        venueManager: updatedProfile.venueManager
+      }));
+
+      return updatedProfile;
     } catch (error) {
-      console.error('Failed to update profile:', error);
+      console.error('Update profile error:', error);
       throw error;
     }
   };

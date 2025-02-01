@@ -2,12 +2,19 @@ import { apiClient, API_ROUTES } from './config';
 
 export const profilesApi = {
   getProfile: (name) => {
-    return apiClient(API_ROUTES.profiles.byName(name));
+    console.log('Fetching profile for:', name);
+    return apiClient(`${API_ROUTES.profiles.byName(name)}?_venues=true`)
+      .then(response => {
+        console.log('Fetched profile data:', response.data);
+        return response;
+      });
   },
 
   updateProfile: async (name, data) => {
     const updateData = {};
     
+    console.log('Received update data:', data);  // Debug incoming data
+
     // Validate data before sending
     if (data.avatar) {
       try {
@@ -40,7 +47,6 @@ export const profilesApi = {
     }
 
     console.log('Sending update data:', updateData);
-    console.log('To endpoint:', API_ROUTES.profiles.byName(name));
 
     try {
       const response = await apiClient(`${API_ROUTES.profiles.byName(name)}`, {
@@ -48,15 +54,22 @@ export const profilesApi = {
         body: JSON.stringify(updateData)
       });
 
-      console.log('Profile update response:', response);
+      // Debug the response
+      console.log('Raw response:', response);
+      console.log('Response data:', response.data);
+
       return response.data;
     } catch (error) {
+      console.error('Profile update error:', error);
       // Add more specific error handling
       if (error.message.includes('401')) {
         throw new Error('Session expired. Please log in again.');
       }
       if (error.message.includes('413')) {
         throw new Error('Image URL too long. Please use a shorter URL.');
+      }
+      if (error.message.includes('400')) {
+        throw new Error('Invalid profile data. Please check your inputs.');
       }
       throw error;
     }

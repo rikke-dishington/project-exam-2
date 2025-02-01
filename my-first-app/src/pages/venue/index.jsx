@@ -58,7 +58,8 @@ function Venue() {
       try {
         setIsLoading(true);
         setError(null);
-        const data = await venueApi.getById(id);
+        const response = await venueApi.getById(id);
+        const data = response.data || response;
         setVenue(data);
       } catch (err) {
         setError(err.message);
@@ -75,11 +76,14 @@ function Venue() {
   if (error) return <ErrorMessage>{error}</ErrorMessage>;
   if (!venue) return <ErrorMessage>Venue not found</ErrorMessage>;
 
+  const location = venue.location || {};
+  const meta = venue.meta || {};
+
   const facilities = [
-    { name: 'WiFi', available: venue.meta.wifi },
-    { name: 'Parking', available: venue.meta.parking },
-    { name: 'Breakfast', available: venue.meta.breakfast },
-    { name: 'Pets allowed', available: venue.meta.pets }
+    { name: 'WiFi', available: meta.wifi },
+    { name: 'Parking', available: meta.parking },
+    { name: 'Breakfast', available: meta.breakfast },
+    { name: 'Pets allowed', available: meta.pets }
   ];
 
   const images = venue.media && venue.media.length > 0
@@ -138,7 +142,7 @@ function Venue() {
             <VenueSubHeader>
               <VenueLocation>
                 <FaMapMarkerAlt />
-                {venue.location.city}, {venue.location.country}
+                {location.city}, {location.country}
               </VenueLocation>
               {venue.rating && (
                 <VenueRating>
@@ -170,9 +174,9 @@ function Venue() {
           <Section>
             <SectionTitle>Location</SectionTitle>
             <AddressInfo>
-              <p>{venue.location.address}</p>
-              <p>{venue.location.city}, {venue.location.zip}</p>
-              <p>{venue.location.country}</p>
+              <p>{location.address}</p>
+              <p>{location.city}, {location.zip}</p>
+              <p>{location.country}</p>
             </AddressInfo>
           </Section>
 
