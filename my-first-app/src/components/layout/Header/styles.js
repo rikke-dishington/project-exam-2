@@ -184,7 +184,20 @@ export const MenuItem = styled.a`
   
   svg {
     font-size: 1.2rem;
-    color: ${({ theme }) => theme.colors.primary.main};
+    color: ${({ theme, $iconColor }) => {
+      switch ($iconColor) {
+        case 'primary':
+          return theme.colors.primary.main;
+        case 'warning':
+          return theme.colors.warning;
+        case 'success':
+          return theme.colors.success;
+        case 'error':
+          return theme.colors.error;
+        default:
+          return theme.colors.primary.main;
+      }
+    }};
   }
   
   &:hover {

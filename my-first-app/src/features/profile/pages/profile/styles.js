@@ -22,11 +22,12 @@ export const EditButton = styled.button`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1.5rem;
   background: ${({ theme }) => theme.colors.primary.main};
   color: white;
   border: none;
   border-radius: 4px;
+  font-size: 1rem;
   cursor: pointer;
   transition: all 0.2s ease;
 
@@ -43,7 +44,7 @@ export const EditButton = styled.button`
 export const ProfileInfo = styled.div`
   background: white;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   overflow: hidden;
 `;
 
@@ -238,6 +239,7 @@ export const BannerImage = styled.div`
   width: 100%;
   height: 200px;
   overflow: hidden;
+  border-radius: 8px;
   background: ${({ theme }) => theme.colors.background.secondary};
 
   img {
@@ -264,7 +266,7 @@ export const AvatarOverlay = styled.div`
   padding: 4px;
   background: white;
   border-radius: 50%;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 `;
 
 export const ProfileAvatar = styled.div`

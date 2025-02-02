@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useUser } from '../../../context/UserContext';
-import { FaUser, FaSignOutAlt } from 'react-icons/fa';
-import { BsHouseDoor } from 'react-icons/bs';
+import { FaUser, FaSignOutAlt, FaList, FaHome } from 'react-icons/fa';
 import {
   HeaderContainer,
   Nav,
@@ -52,7 +51,9 @@ function Header() {
                 <MenuItem 
                   as={Link} 
                   to={`/profiles/${user.name}`} 
-                  onClick={closeMenu}>
+                  onClick={closeMenu}
+                  $iconColor="primary"
+                >
                   <FaUser />
                   Profile
                 </MenuItem>
@@ -60,17 +61,27 @@ function Header() {
                   as={Link} 
                   to={`/profiles/${user.name}/bookings`} 
                   onClick={closeMenu}
+                  $iconColor="warning"
                 >
-                  <BsHouseDoor />
-                  My Bookings
+                  <FaList />
+                  Bookings
                 </MenuItem>
                 {isVenueManager && (
-                  <MenuItem as={Link} to="/manage-venues" onClick={closeMenu}>
-                    <BsHouseDoor />
-                    Manage Venues
+                  <MenuItem 
+                    as={Link} 
+                    to="/manage-venues" 
+                    onClick={closeMenu}
+                    $iconColor="success"
+                  >
+                    <FaHome />
+                    Venues
                   </MenuItem>
                 )}
-                <MenuItem as="button" onClick={handleLogout}>
+                <MenuItem 
+                  as="button" 
+                  onClick={handleLogout}
+                  $iconColor="error"
+                >
                   <FaSignOutAlt />
                   Logout
                 </MenuItem>

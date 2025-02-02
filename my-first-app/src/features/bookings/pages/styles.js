@@ -77,6 +77,11 @@ export const VenueName = styled.h3`
   margin: 0 0 0.5rem 0;
   font-size: 1.25rem;
   color: ${({ theme }) => theme.colors.text.primary};
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  line-height: 1.4;
 `;
 
 export const Location = styled.div`

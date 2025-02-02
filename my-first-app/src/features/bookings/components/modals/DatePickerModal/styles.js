@@ -17,7 +17,7 @@ export const ModalContent = styled.div`
   background: white;
   padding: 2rem;
   border-radius: 8px;
-  max-width: 500px;
+  max-width: 800px;
   width: 90%;
   max-height: 90vh;
   overflow-y: auto;
@@ -49,55 +49,21 @@ export const CloseButton = styled.button`
   }
 `;
 
-export const BookingDetails = styled.div`
-  h3 {
-    margin: 0 0 1rem 0;
-    color: ${({ theme }) => theme.colors.text.primary};
+export const CalendarWrapper = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
   }
-`;
-
-export const DateRange = styled.div`
-  margin-bottom: 1rem;
-  color: ${({ theme }) => theme.colors.text.primary};
-
-  div {
-    margin: 0.5rem 0;
-  }
-`;
-
-export const GuestCount = styled.div`
-  margin-bottom: 1.5rem;
-  color: ${({ theme }) => theme.colors.text.primary};
-`;
-
-export const PriceBreakdown = styled.div`
-  border-top: 1px solid ${({ theme }) => theme.colors.border};
-  padding-top: 1rem;
-  margin-bottom: 1rem;
-
-  div {
-    display: flex;
-    justify-content: space-between;
-    margin: 0.5rem 0;
-    color: ${({ theme }) => theme.colors.text.primary};
-  }
-`;
-
-export const TotalPrice = styled.div`
-  display: flex;
-  justify-content: space-between;
-  font-weight: bold;
-  font-size: 1.2rem;
-  color: ${({ theme }) => theme.colors.text.primary};
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid ${({ theme }) => theme.colors.border};
 `;
 
 export const ButtonGroup = styled.div`
   display: flex;
   gap: 1rem;
-  margin-top: 2rem;
+  justify-content: flex-end;
 `;
 
 export const Button = styled.button`
@@ -118,28 +84,10 @@ export const CancelButton = styled(Button)`
   }
 `;
 
-export const ConfirmButton = styled(Button)`
-  background: ${({ theme }) => theme.colors.success};
-  border: none;
-  color: white;
-  margin-top: 1rem;
-
-  &:hover:not(:disabled) {
-    background: ${({ theme }) => theme.colors.success};
-    opacity: 0.9;
-  }
-
-  &:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-  }
-`;
-
-export const LoginButton = styled(Button)`
+export const ApplyButton = styled(Button)`
   background: ${({ theme }) => theme.colors.primary.main};
   border: none;
   color: white;
-  margin-top: 1rem;
 
   &:hover:not(:disabled) {
     background: ${({ theme }) => theme.colors.primary.main};
@@ -150,4 +98,4 @@ export const LoginButton = styled(Button)`
     opacity: 0.7;
     cursor: not-allowed;
   }
-`;
+`; 

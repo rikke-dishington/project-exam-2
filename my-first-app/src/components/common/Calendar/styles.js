@@ -10,16 +10,29 @@ export const CalendarWrapper = styled.div`
     border: none;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     font-family: inherit;
+    display: flex !important;
+    justify-content: center;
   }
 
   .react-datepicker__month-container {
     float: none;
-    width: 100%;
+    width: 320px;
+    margin: 0 8px;
   }
 
   .react-datepicker__header {
     background: ${({ theme }) => theme.colors.background.secondary};
     border-bottom: 1px solid ${({ theme }) => theme.colors.border};
+  }
+
+  .react-datepicker__month {
+    margin: 0.4rem;
+  }
+
+  .react-datepicker__day-name {
+    width: 2.5rem;
+    line-height: 2.5rem;
+    margin: 0.2rem;
   }
 
   .react-datepicker__day {
@@ -47,10 +60,24 @@ export const CalendarWrapper = styled.div`
       color: ${({ theme }) => theme.colors.text.disabled};
       background: ${({ theme }) => theme.colors.background.disabled};
       cursor: not-allowed;
+      opacity: 1 !important;
 
       &:hover {
         background: ${({ theme }) => theme.colors.background.disabled};
+        cursor: not-allowed;
       }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .react-datepicker {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .react-datepicker__month-container {
+      margin: 0;
+      margin-bottom: 1rem;
     }
   }
 `;

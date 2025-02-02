@@ -6,6 +6,7 @@ export const GuestSelectorWrapper = styled.div`
   justify-content: space-between;
   padding: 1rem;
   background: ${({ theme }) => theme.colors.background.secondary};
+  border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: 8px;
   margin: 1rem 0;
   opacity: ${({ $disabled }) => ($disabled ? 0.7 : 1)};
@@ -19,7 +20,7 @@ export const GuestInfo = styled.div`
   color: ${({ theme }) => theme.colors.text.primary};
 
   svg {
-    color: ${({ theme }) => theme.colors.text.secondary};
+    color: ${({ theme }) => theme.colors.success};
   }
 
   ${({ $disabled }) => $disabled && `
@@ -49,12 +50,13 @@ export const GuestButton = styled.button`
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: ${({ theme }) => theme.colors.text.primary};
+  color: ${({ theme }) => theme.colors.primary.main};
   transition: all 0.2s ease;
 
   &:hover:not(:disabled) {
+    background: ${({ theme }) => theme.colors.background.secondary};
     border-color: ${({ theme }) => theme.colors.primary.main};
-    color: ${({ theme }) => theme.colors.primary.main};
+    color: ${({ theme }) => theme.colors.primary.dark};
   }
 
   &:disabled {
@@ -63,6 +65,6 @@ export const GuestButton = styled.button`
   }
 
   svg {
-    font-size: 0.8rem;
+    font-size: 1rem;
   }
 `; 

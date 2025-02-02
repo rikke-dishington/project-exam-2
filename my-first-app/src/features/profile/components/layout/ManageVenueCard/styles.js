@@ -51,9 +51,19 @@ export const VenueDetails = styled.div`
   }
 
   .price {
-    color: ${({ theme }) => theme.colors.primary.main};
+    color: ${({ theme }) => theme.colors.text.primary};
     font-weight: 500;
     margin-top: 0.5rem;
+    
+    span.amount {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    
+    span.label {
+      color: ${({ theme }) => theme.colors.text.secondary};
+      font-size: 0.9rem;
+    }
   }
 `;
 
@@ -64,28 +74,56 @@ export const ActionButtons = styled.div`
   border-top: 1px solid ${({ theme }) => theme.colors.border};
 `;
 
-export const IconButton = styled.button`
+const Button = styled.button`
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
   border: none;
   border-radius: 4px;
-  background: ${({ $danger, theme }) => 
-    $danger ? theme.colors.error + '20' : theme.colors.background.secondary};
-  color: ${({ $danger, theme }) => 
-    $danger ? theme.colors.error : theme.colors.text.secondary};
+  font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s ease;
+  color: white;
 
-  &:hover {
-    background: ${({ $danger, theme }) => 
-      $danger ? theme.colors.error + '30' : theme.colors.background.primary};
-    transform: translateY(-2px);
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
   svg {
     font-size: 1rem;
+  }
+`;
+
+export const IconButton = styled(Button)`
+  flex: 1;
+  justify-content: center;
+  
+  &:first-child {
+    background: ${({ theme }) => theme.colors.success};
+    
+    &:hover:not(:disabled) {
+      background: ${({ theme }) => theme.colors.success};
+      opacity: 0.9;
+    }
+  }
+  
+  &:nth-child(2) {
+    background: ${({ theme }) => theme.colors.primary.main};
+    
+    &:hover:not(:disabled) {
+      background: ${({ theme }) => theme.colors.primary.main};
+      opacity: 0.9;
+    }
+  }
+  
+  &:last-child {
+    background: ${({ theme }) => theme.colors.error};
+    
+    &:hover:not(:disabled) {
+      background: ${({ theme }) => theme.colors.error};
+      opacity: 0.9;
+    }
   }
 `; 

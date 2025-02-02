@@ -77,6 +77,6 @@ export const Rating = styled.div`
   color: ${({ theme }) => theme.colors.text.secondary};
 
   svg {
-    color: #ffd700;
+    color: ${({ theme }) => theme.colors.rating.star};
   }
 `;

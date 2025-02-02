@@ -4,7 +4,7 @@ export const FiltersContainer = styled.div`
   background: white;
   padding: 1.5rem;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   margin-bottom: 2rem;
 `;
 
@@ -47,6 +47,24 @@ export const CheckboxLabel = styled.label`
   transition: all 0.2s ease;
   color: ${({ theme }) => theme.colors.text.secondary};
 
+  svg {
+    font-size: 1.2rem;
+    
+    /* Specific colors for each icon */
+    &.fa-wifi {
+      color: ${({ theme }) => theme.colors.facilities.wifi};
+    }
+    &.fa-parking {
+      color: ${({ theme }) => theme.colors.facilities.parking};
+    }
+    &.fa-coffee {
+      color: ${({ theme }) => theme.colors.facilities.breakfast};
+    }
+    &.fa-paw {
+      color: ${({ theme }) => theme.colors.facilities.pets};
+    }
+  }
+
   input:checked + & {
     background: ${({ theme }) => theme.colors.primary.main}15;
     color: ${({ theme }) => theme.colors.primary.main};
@@ -54,10 +72,6 @@ export const CheckboxLabel = styled.label`
 
   &:hover {
     background: ${({ theme }) => theme.colors.background.secondary};
-  }
-
-  svg {
-    font-size: 1.2rem;
   }
 `;
 

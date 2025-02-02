@@ -9,7 +9,17 @@ import {
   VenueFilterDrawer
 } from '../../components';
 import LoadingSpinner from '../../../../components/common/LoadingSpinner';
-import { Container, Header, Title } from './styles';
+import {
+  Container,
+  Header,
+  HeaderContent,
+  Title,
+  Subtitle,
+  MainContent,
+  ControlsBar,
+  SectionTitle,
+  Controls,
+} from './styles';
 
 function Venues() {
   const navigate = useNavigate();
@@ -147,20 +157,25 @@ function Venues() {
     return (
       <Container>
         <Header>
-          <Title>Find your perfect stay</Title>
-          <VenueSearchBar 
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            onSearch={handleSearch}
-            onClear={handleClearSearch}
-          />
+          <HeaderContent>
+            <Title>Find your perfect stay</Title>
+            <Subtitle>Hotels, cabins, apartments and much more</Subtitle>
+            <VenueSearchBar 
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              onSearch={handleSearch}
+              onClear={handleClearSearch}
+            />
+          </HeaderContent>
         </Header>
-        <LoadingSpinner 
-          text={searchParams.get('q') 
-            ? `Searching for "${searchParams.get('q')}"...` 
-            : 'Loading venues...'
-          }
-        />
+        <MainContent>
+          <LoadingSpinner 
+            text={searchParams.get('q') 
+              ? `Searching for "${searchParams.get('q')}"...` 
+              : 'Loading venues...'
+            }
+          />
+        </MainContent>
       </Container>
     );
   }
@@ -169,15 +184,20 @@ function Venues() {
     return (
       <Container>
         <Header>
-          <Title>Find your perfect stay</Title>
-          <VenueSearchBar 
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            onSearch={handleSearch}
-            onClear={handleClearSearch}
-          />
+          <HeaderContent>
+            <Title>Find your perfect stay</Title>
+            <Subtitle>Hotels, cabins, apartments and much more</Subtitle>
+            <VenueSearchBar 
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              onSearch={handleSearch}
+              onClear={handleClearSearch}
+            />
+          </HeaderContent>
         </Header>
-        <div className="error-message">{error}</div>
+        <MainContent>
+          <div className="error-message">{error}</div>
+        </MainContent>
       </Container>
     );
   }
@@ -185,43 +205,49 @@ function Venues() {
   return (
     <Container>
       <Header>
-        <Title>Find your perfect stay</Title>
-        <VenueSearchBar 
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          onSearch={handleSearch}
-          onClear={handleClearSearch}
-        />
+        <HeaderContent>
+          <Title>Find your perfect stay</Title>
+          <Subtitle>Hotels, cabins, apartments and much more</Subtitle>
+          <VenueSearchBar 
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            onSearch={handleSearch}
+            onClear={handleClearSearch}
+          />
+        </HeaderContent>
       </Header>
       
-      {venues.length > 0 && (
-        <>
-          <VenueFiltersBar 
-            totalResults={sortedVenues.length}
-            hasActiveFilters={hasActiveFilters}
-            onFilterClick={() => setIsFilterDrawerOpen(true)}
-          />
+      <MainContent>
+        {venues.length > 0 && (
+          <ControlsBar>
+            <SectionTitle>Venues</SectionTitle>
+            <Controls>
+              <VenueFiltersBar 
+                hasActiveFilters={hasActiveFilters}
+                onFilterClick={() => setIsFilterDrawerOpen(true)}
+              />
+              <VenueSort 
+                sortBy={sortBy}
+                onSort={handleSort}
+              />
+            </Controls>
+          </ControlsBar>
+        )}
 
-          <VenueFilterDrawer 
-            isOpen={isFilterDrawerOpen}
-            onClose={() => setIsFilterDrawerOpen(false)}
-            onFilterChange={handleFilterChange}
-            initialFilters={filters}
-            totalResults={sortedVenues.length}
-          />
-          
-          <VenueSort 
-            sortBy={sortBy}
-            onSort={handleSort}
-          />
-        </>
-      )}
+        <VenueFilterDrawer 
+          isOpen={isFilterDrawerOpen}
+          onClose={() => setIsFilterDrawerOpen(false)}
+          onFilterChange={handleFilterChange}
+          initialFilters={filters}
+          totalResults={sortedVenues.length}
+        />
 
-      <VenueGrid 
-        venues={sortedVenues}
-        onVenueClick={handleVenueClick}
-        searchQuery={searchParams.get('q')}
-      />
+        <VenueGrid 
+          venues={sortedVenues}
+          onVenueClick={handleVenueClick}
+          searchQuery={searchParams.get('q')}
+        />
+      </MainContent>
     </Container>
   );
 }

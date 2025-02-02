@@ -38,7 +38,33 @@ function Calendar({
     }
   };
 
-  const excludedDates = disabledDates.map(date => new Date(date));
+  // Generate all dates between two dates
+  const getDatesBetween = (startDate, endDate) => {
+    const dates = [];
+    let currentDate = new Date(startDate);
+    const lastDate = new Date(endDate);
+
+    while (currentDate <= lastDate) {
+      dates.push(new Date(currentDate));
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    return dates;
+  };
+
+  // Get all booked dates from venue bookings
+  const getAllBookedDates = () => {
+    if (!venue.bookings || !Array.isArray(venue.bookings)) return [];
+
+    return venue.bookings.reduce((dates, booking) => {
+      const bookingDates = getDatesBetween(
+        new Date(booking.dateFrom),
+        new Date(booking.dateTo)
+      );
+      return [...dates, ...bookingDates];
+    }, []);
+  };
+
+  const excludedDates = getAllBookedDates();
 
   return (
     <CalendarWrapper>

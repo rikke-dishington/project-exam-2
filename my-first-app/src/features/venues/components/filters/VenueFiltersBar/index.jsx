@@ -1,22 +1,18 @@
 import { FaFilter } from 'react-icons/fa';
 import {
   FiltersSection,
-  ResultsInfo,
   FilterButton,
   ActiveFilterDot
 } from './styles';
 
-function VenueFiltersBar({ totalResults, hasActiveFilters, onFilterClick }) {
+function VenueFiltersBar({ hasActiveFilters, onFilterClick }) {
   return (
     <FiltersSection>
-      <ResultsInfo>
-        <span>{totalResults} venues found</span>
-        <FilterButton onClick={onFilterClick}>
-          <FaFilter /> 
-          <span>Filters</span>
-          {hasActiveFilters && <ActiveFilterDot />}
-        </FilterButton>
-      </ResultsInfo>
+      <FilterButton onClick={onFilterClick}>
+        <FaFilter /> 
+        <span>Filters</span>
+        {hasActiveFilters && <ActiveFilterDot />}
+      </FilterButton>
     </FiltersSection>
   );
 }

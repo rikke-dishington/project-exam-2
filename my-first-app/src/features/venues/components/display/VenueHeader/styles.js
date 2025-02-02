@@ -33,6 +33,6 @@ export const Rating = styled.div`
   gap: 0.25rem;
 
   svg {
-    color: ${({ theme }) => theme.colors.warning};
+    color: ${({ theme }) => theme.colors.rating.star};
   }
 `; 
