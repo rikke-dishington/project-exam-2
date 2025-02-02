@@ -69,8 +69,8 @@ VenueGrid.propTypes = {
     name: PropTypes.string.isRequired,
     price: PropTypes.number.isRequired,
     location: PropTypes.shape({
-      city: PropTypes.string.isRequired,
-      country: PropTypes.string.isRequired
+      city: PropTypes.string,
+      country: PropTypes.string
     }).isRequired
   })).isRequired,
   onVenueClick: PropTypes.func.isRequired,

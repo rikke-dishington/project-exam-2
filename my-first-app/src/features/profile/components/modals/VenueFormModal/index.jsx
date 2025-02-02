@@ -18,13 +18,6 @@ import {
   SubmitButton,
   Checkbox,
   Grid,
-  ImagePreview,
-  ImagePreviewContainer,
-  ImagePreviewTitle,
-  ImagePreviewList,
-  ImagePreviewItem,
-  ImagePreviewImage,
-  ImagePreviewError
 } from './styles';
 
 /**
@@ -75,7 +68,11 @@ function VenueFormModal({ venue, onClose, onSubmit }) {
   const [formData, setFormData] = useState({
     name: venue?.name || '',
     description: venue?.description || '',
-    media: venue?.media || [],
+    media: venue?.media ? venue.media.map(item => 
+      typeof item === 'string' 
+        ? { url: item, alt: `Image of ${venue.name}` }
+        : item
+    ) : [],
     price: venue?.price || '',
     maxGuests: venue?.maxGuests || '',
     location: {
@@ -405,7 +402,13 @@ VenueFormModal.propTypes = {
   venue: PropTypes.shape({
     name: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
-    media: PropTypes.arrayOf(PropTypes.string).isRequired,
+    media: PropTypes.arrayOf(PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.shape({
+        url: PropTypes.string.isRequired,
+        alt: PropTypes.string
+      })
+    ])).isRequired,
     price: PropTypes.number.isRequired,
     maxGuests: PropTypes.number.isRequired,
     meta: PropTypes.shape({

@@ -84,7 +84,7 @@ export const apiClient = async (endpoint, options = {}) => {
   const requestOptions = {
     ...options,
     headers,
-    body: options.body ? JSON.stringify(typeof options.body === 'string' ? JSON.parse(options.body) : options.body) : undefined
+    body: options.body ? JSON.stringify(options.body) : undefined
   };
 
   try {

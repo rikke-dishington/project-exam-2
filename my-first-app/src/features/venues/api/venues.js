@@ -28,7 +28,7 @@ export const venueApi = {
   create: async (data) => {
     const response = await apiClient(API_ROUTES.venues.base, {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: data,
     });
     return response.data;
   },
@@ -36,7 +36,7 @@ export const venueApi = {
   update: async (id, data) => {
     const response = await apiClient(API_ROUTES.venues.byId(id), {
       method: 'PUT',
-      body: JSON.stringify(data),
+      body: data,
     });
     return response.data;
   },
@@ -60,6 +60,14 @@ export const venueApi = {
 
   createVenue: async (venueData) => {
     try {
+      // Validate required fields
+      if (!venueData.location?.city) {
+        throw new Error('City is required');
+      }
+      if (!venueData.location?.country) {
+        throw new Error('Country is required');
+      }
+
       const formattedData = {
         name: String(venueData.name),
         description: String(venueData.description || ''),
@@ -80,9 +88,9 @@ export const venueApi = {
         },
         location: {
           address: String(venueData.location?.address || ''),
-          city: String(venueData.location?.city || ''),
+          city: String(venueData.location.city),
           zip: String(venueData.location?.zip || ''),
-          country: String(venueData.location?.country || ''),
+          country: String(venueData.location.country),
           continent: String(venueData.location?.continent || ''),
           lat: 0,
           lng: 0
@@ -91,7 +99,7 @@ export const venueApi = {
 
       const response = await apiClient(API_ROUTES.venues.base, {
         method: 'POST',
-        body: JSON.stringify(formattedData)
+        body: formattedData
       });
 
       return response.data;
@@ -107,9 +115,43 @@ export const venueApi = {
 
   updateVenue: async (id, venueData) => {
     try {
+      // Validate required fields
+      if (!venueData.location?.city) {
+        throw new Error('City is required');
+      }
+      if (!venueData.location?.country) {
+        throw new Error('Country is required');
+      }
+
+      const formattedData = {
+        name: String(venueData.name),
+        description: String(venueData.description || ''),
+        media: Array.isArray(venueData.media) 
+          ? venueData.media.map(img => typeof img === 'string' ? img : img.url).filter(Boolean)
+          : [],
+        price: Number(venueData.price),
+        maxGuests: Number(venueData.maxGuests),
+        rating: venueData.rating || 0,
+        meta: {
+          wifi: Boolean(venueData.meta?.wifi),
+          parking: Boolean(venueData.meta?.parking),
+          breakfast: Boolean(venueData.meta?.breakfast),
+          pets: Boolean(venueData.meta?.pets)
+        },
+        location: {
+          address: String(venueData.location?.address || ''),
+          city: String(venueData.location.city),
+          zip: String(venueData.location?.zip || ''),
+          country: String(venueData.location.country),
+          continent: String(venueData.location?.continent || ''),
+          lat: Number(venueData.location?.lat || 0),
+          lng: Number(venueData.location?.lng || 0)
+        }
+      };
+
       const response = await apiClient(API_ROUTES.venues.byId(id), {
         method: 'PUT',
-        body: JSON.stringify(venueData)
+        body: formattedData
       });
       return response.data;
     } catch (error) {
