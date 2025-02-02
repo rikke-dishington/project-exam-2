@@ -173,7 +173,7 @@ function VenueFormModal({ venue, onClose, onSubmit }) {
       const venueData = {
         name: String(formData.name),
         description: String(formData.description || ''),
-        media: formData.media.filter(media => media && media.url).map(media => media.url),
+        media: formData.media.filter(url => url),
         price: Number(formData.price),
         maxGuests: Number(formData.maxGuests),
         location: {
