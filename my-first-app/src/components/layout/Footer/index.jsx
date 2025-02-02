@@ -9,6 +9,47 @@ import {
   SocialLink,
 } from './styles';
 
+/**
+ * Footer Component
+ * 
+ * The site footer component that provides navigation links, social media connections,
+ * and copyright information. Organized in a multi-column layout with distinct sections.
+ * 
+ * Features:
+ * - Multi-column layout
+ * - Organized content sections
+ * - Dynamic copyright year
+ * - Social media links
+ * - Navigation links
+ * 
+ * Sections:
+ * 1. Company Information:
+ *    - About Us
+ *    - Terms & Conditions
+ * 
+ * 2. Support:
+ *    - Contact information
+ * 
+ * 3. User Actions:
+ *    - Property listing
+ *    - Login access
+ * 
+ * 4. Social Media:
+ *    - Instagram link
+ * 
+ * @component
+ * @example
+ * ```jsx
+ * function App() {
+ *   return (
+ *     <div>
+ *       <main>Content</main>
+ *       <Footer />
+ *     </div>
+ *   );
+ * }
+ * ```
+ */
 function Footer() {
   const currentYear = new Date().getFullYear();
 

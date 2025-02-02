@@ -1,5 +1,47 @@
 import styled, { css } from 'styled-components';
 
+/**
+ * Button Component
+ * 
+ * A versatile button component that supports multiple variants, sizes, and states.
+ * Provides consistent styling and behavior for all interactive buttons in the application.
+ * 
+ * Features:
+ * - Multiple variants (primary, secondary, outline, text, error)
+ * - Different sizes (small, medium, large)
+ * - Icon support
+ * - Full width option
+ * - Rounded corners option
+ * - Disabled state
+ * - Hover effects
+ * 
+ * Variants:
+ * - primary: Main action button
+ * - secondary: Alternative action button
+ * - outline: Border-only button
+ * - text: Text-only button
+ * - error: Destructive action button
+ * 
+ * Props:
+ * @param {string} variant - Button style variant ('primary', 'secondary', 'outline', 'text', 'error')
+ * @param {string} size - Button size ('small', 'medium', 'large')
+ * @param {boolean} fullWidth - Whether button should take full width
+ * @param {boolean} rounded - Whether to use fully rounded corners
+ * @param {boolean} disabled - Whether button is disabled
+ * 
+ * @example
+ * ```jsx
+ * <Button
+ *   variant="primary"
+ *   size="medium"
+ *   onClick={handleClick}
+ *   disabled={isLoading}
+ * >
+ *   <FaIcon /> Click Me
+ * </Button>
+ * ```
+ */
+
 const getVariantStyles = ({ variant = 'primary', theme }) => {
   const variants = {
     primary: css`
