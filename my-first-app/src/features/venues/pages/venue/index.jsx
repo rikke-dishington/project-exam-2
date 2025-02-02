@@ -23,6 +23,48 @@ import {
   ErrorMessage,
 } from './styles';
 
+/**
+ * Venue Page Component
+ * 
+ * A detailed view page for a single venue. Displays comprehensive information
+ * about the venue and provides booking functionality.
+ * 
+ * Features:
+ * - Image carousel
+ * - Venue details display
+ * - Booking form
+ * - Facilities list
+ * - Host information
+ * - Location details
+ * - Loading states
+ * - Error handling
+ * - Responsive layout
+ * 
+ * State Management:
+ * - Manages venue data fetching
+ * - Handles loading and error states
+ * - Integrates with booking store
+ * - Cleans up booking state on unmount
+ * 
+ * Layout Structure:
+ * - Top: Image carousel
+ * - Left: Venue information
+ *   - Header with name and rating
+ *   - Description
+ *   - Facilities
+ *   - Location
+ *   - Host info
+ * - Right: Booking form
+ * - Modal: Booking summary
+ * 
+ * @component
+ * @example
+ * ```jsx
+ * <Routes>
+ *   <Route path="/venue/:id" element={<Venue />} />
+ * </Routes>
+ * ```
+ */
 function Venue() {
   const { id } = useParams();
   const [venue, setVenue] = useState(null);
@@ -30,6 +72,10 @@ function Venue() {
   const [error, setError] = useState(null);
   const { clearBooking } = useBookingStore();
 
+  /**
+   * Fetches venue data and handles state updates
+   * Cleans up booking state on component unmount
+   */
   useEffect(() => {
     const fetchVenue = async () => {
       try {
@@ -49,13 +95,17 @@ function Venue() {
     return () => clearBooking();
   }, [id, clearBooking]);
 
-  if (isLoading) return <LoadingSpinner>Loading...</LoadingSpinner>;
-  if (error) return <ErrorMessage>{error}</ErrorMessage>;
-  if (!venue) return <ErrorMessage>Venue not found</ErrorMessage>;
+  if (isLoading) return <LoadingSpinner aria-label="Loading venue details">Loading...</LoadingSpinner>;
+  if (error) return <ErrorMessage role="alert">{error}</ErrorMessage>;
+  if (!venue) return <ErrorMessage role="alert">Venue not found</ErrorMessage>;
 
   const location = venue.location || {};
   const meta = venue.meta || {};
 
+  /**
+   * Transforms venue meta data into facilities array
+   * for display in the facilities list
+   */
   const facilities = [
     { name: 'WiFi', available: meta.wifi },
     { name: 'Parking', available: meta.parking },

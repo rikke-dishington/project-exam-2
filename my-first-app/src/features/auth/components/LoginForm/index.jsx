@@ -13,6 +13,27 @@ import {
   FieldError,
 } from './styles';
 
+/**
+ * LoginForm Component
+ * 
+ * A form component that handles user authentication through email and password.
+ * Includes field validation, error handling, and loading states.
+ * 
+ * Features:
+ * - Email validation for @stud.noroff.no domain
+ * - Password validation
+ * - Real-time field validation
+ * - Loading state during authentication
+ * - Error messages for invalid inputs and failed login attempts
+ * - Navigation to home page on successful login
+ * - Link to registration page for new users
+ * 
+ * @component
+ * @example
+ * ```jsx
+ * <LoginForm />
+ * ```
+ */
 function LoginForm() {
   const navigate = useNavigate();
   const { updateUser } = useUser();
@@ -24,6 +45,13 @@ function LoginForm() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  /**
+   * Validates individual form fields based on specific rules
+   * 
+   * @param {string} name - The name of the field to validate
+   * @param {string} value - The value to validate
+   * @returns {string} Empty string if valid, error message if invalid
+   */
   const validateField = (name, value) => {
     switch (name) {
       case 'email':
@@ -46,6 +74,14 @@ function LoginForm() {
     }
   };
 
+  /**
+   * Handles changes in form input fields
+   * Updates the form state with the new values
+   * 
+   * @param {Object} e - The change event object
+   * @param {string} e.target.name - The name of the changed field
+   * @param {string} e.target.value - The new value of the field
+   */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -54,6 +90,13 @@ function LoginForm() {
     }));
   };
 
+  /**
+   * Handles form submission
+   * Validates all fields, attempts login, and handles the response
+   * 
+   * @param {Object} e - The submit event object
+   * @returns {Promise<void>}
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');

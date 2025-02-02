@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { useState } from 'react';
 import { FaImage, FaTimes } from 'react-icons/fa';
 import {
@@ -16,10 +17,61 @@ import {
   ErrorMessage,
   SubmitButton,
   Checkbox,
-  Grid
+  Grid,
+  ImagePreview,
+  ImagePreviewContainer,
+  ImagePreviewTitle,
+  ImagePreviewList,
+  ImagePreviewItem,
+  ImagePreviewImage,
+  ImagePreviewError
 } from './styles';
 
-function VenueModal({ venue, onClose, onSave }) {
+/**
+ * VenueFormModal Component
+ * 
+ * A comprehensive modal form for creating or editing venue details. Provides a rich
+ * interface for managing venue information including media, location, and amenities.
+ * 
+ * Features:
+ * - Create new venues or edit existing ones
+ * - Rich form validation
+ * - Image URL validation and preview
+ * - Location management
+ * - Amenities selection
+ * - Error handling and display
+ * - Loading state management
+ * - Accessible form controls
+ * 
+ * @component
+ * @example
+ * ```jsx
+ * // For creating a new venue
+ * <VenueFormModal
+ *   onClose={() => setIsModalOpen(false)}
+ *   onSubmit={async (formData) => {
+ *     await createVenue(formData);
+ *     refreshVenues();
+ *   }}
+ * />
+ * 
+ * // For editing an existing venue
+ * <VenueFormModal
+ *   venue={existingVenue}
+ *   onClose={() => setIsModalOpen(false)}
+ *   onSubmit={async (formData) => {
+ *     await updateVenue(venueId, formData);
+ *     refreshVenues();
+ *   }}
+ * />
+ * ```
+ * 
+ * @param {Object} props - Component props
+ * @param {Object} [props.venue] - Existing venue data for editing (optional)
+ * @param {Function} props.onClose - Callback when modal is closed
+ * @param {Function} props.onSubmit - Async callback when form is submitted
+ */
+function VenueFormModal({ venue, onClose, onSubmit }) {
   const [formData, setFormData] = useState({
     name: venue?.name || '',
     description: venue?.description || '',
@@ -139,7 +191,7 @@ function VenueModal({ venue, onClose, onSave }) {
         }
       };
 
-      await onSave(venueData);
+      await onSubmit(venueData);
       onClose();
     } catch (err) {
       console.error('Form submission error:', err);
@@ -349,4 +401,31 @@ function VenueModal({ venue, onClose, onSave }) {
   );
 }
 
-export default VenueModal; 
+VenueFormModal.propTypes = {
+  venue: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    media: PropTypes.arrayOf(PropTypes.string).isRequired,
+    price: PropTypes.number.isRequired,
+    maxGuests: PropTypes.number.isRequired,
+    meta: PropTypes.shape({
+      wifi: PropTypes.bool,
+      parking: PropTypes.bool,
+      breakfast: PropTypes.bool,
+      pets: PropTypes.bool
+    }).isRequired,
+    location: PropTypes.shape({
+      address: PropTypes.string,
+      city: PropTypes.string,
+      zip: PropTypes.string,
+      country: PropTypes.string,
+      continent: PropTypes.string,
+      lat: PropTypes.number,
+      lng: PropTypes.number
+    }).isRequired
+  }),
+  onClose: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired
+};
+
+export default VenueFormModal; 

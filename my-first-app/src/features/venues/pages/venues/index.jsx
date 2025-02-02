@@ -21,6 +21,44 @@ import {
   Controls,
 } from './styles';
 
+/**
+ * Venues Page Component
+ * 
+ * The main venue listing page that displays all available venues with search,
+ * sort, and filter capabilities. Provides a comprehensive interface for users
+ * to find their perfect accommodation.
+ * 
+ * Features:
+ * - Venue search functionality
+ * - Advanced filtering options
+ * - Multiple sorting methods
+ * - Responsive grid layout
+ * - Loading states
+ * - Error handling
+ * - URL parameter sync
+ * - Mobile-friendly interface
+ * 
+ * State Management:
+ * - Manages venue data fetching and filtering
+ * - Handles search parameters
+ * - Controls sorting state
+ * - Manages filter drawer state
+ * - Syncs URL with current filters
+ * 
+ * URL Parameters:
+ * - q: Search query
+ * - sort: Sorting method
+ * - wifi, parking, breakfast, pets: Facility filters
+ * - maxPrice: Price filter
+ * 
+ * @component
+ * @example
+ * ```jsx
+ * <Routes>
+ *   <Route path="/venues" element={<Venues />} />
+ * </Routes>
+ * ```
+ */
 function Venues() {
   const navigate = useNavigate();
   const [venues, setVenues] = useState([]);
@@ -31,14 +69,18 @@ function Venues() {
   const [searchTerm, setSearchTerm] = useState(searchParams.get('q') || '');
   const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'default');
   const [filters, setFilters] = useState({
-    wifi: false,
-    parking: false,
-    breakfast: false,
-    pets: false,
-    maxPrice: 1000,
+    wifi: searchParams.get('wifi') === 'true',
+    parking: searchParams.get('parking') === 'true',
+    breakfast: searchParams.get('breakfast') === 'true',
+    pets: searchParams.get('pets') === 'true',
+    maxPrice: parseInt(searchParams.get('maxPrice')) || 1000,
   });
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
+  /**
+   * Fetches venues based on search parameters
+   * Updates venues state and handles loading/error states
+   */
   const fetchVenues = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -60,6 +102,11 @@ function Venues() {
     fetchVenues();
   }, [fetchVenues]);
 
+  /**
+   * Filters venues based on selected facility and price filters
+   * @param {Array} venuesList - List of venues to filter
+   * @returns {Array} Filtered venues list
+   */
   const filterVenues = useCallback((venuesList) => {
     return venuesList.filter(venue => {
       if (venue.price > filters.maxPrice) {
@@ -83,6 +130,11 @@ function Venues() {
     });
   }, [filters]);
 
+  /**
+   * Sorts venues based on selected sort method
+   * @param {Array} venuesList - List of venues to sort
+   * @returns {Array} Sorted venues list
+   */
   const sortVenues = useCallback((venuesList) => {
     const sortedResults = [...venuesList];
     switch (sortBy) {
@@ -103,6 +155,10 @@ function Venues() {
     setSortedVenues(sortedResults);
   }, [venues, filterVenues, sortVenues]);
 
+  /**
+   * Handles sort method changes and updates URL parameters
+   * @param {string} value - New sort method
+   */
   const handleSort = useCallback((value) => {
     setSortBy(value);
     setSearchParams(prev => {
@@ -115,6 +171,10 @@ function Venues() {
     });
   }, [setSearchParams]);
 
+  /**
+   * Handles search submission and updates URL parameters
+   * @param {string} term - Search term
+   */
   const handleSearch = useCallback((term) => {
     if (term.trim()) {
       setSearchParams({ q: term.trim(), ...(sortBy !== 'default' && { sort: sortBy }) });
@@ -123,11 +183,18 @@ function Venues() {
     }
   }, [setSearchParams, sortBy]);
 
+  /**
+   * Clears search term and updates URL parameters
+   */
   const handleClearSearch = useCallback(() => {
     setSearchTerm('');
     setSearchParams(sortBy !== 'default' ? { sort: sortBy } : {});
   }, [setSearchParams, sortBy]);
 
+  /**
+   * Handles filter changes and updates URL parameters
+   * @param {Object} newFilters - New filter values
+   */
   const handleFilterChange = useCallback((newFilters) => {
     setFilters(newFilters);
     setSearchParams(prev => {
@@ -149,6 +216,10 @@ function Venues() {
     return value === true;
   });
 
+  /**
+   * Handles venue selection and navigation
+   * @param {string} id - Venue ID to navigate to
+   */
   const handleVenueClick = useCallback((id) => {
     navigate(`/venue/${id}`);
   }, [navigate]);
@@ -196,7 +267,7 @@ function Venues() {
           </HeaderContent>
         </Header>
         <MainContent>
-          <div className="error-message">{error}</div>
+          <div role="alert" className="error-message">{error}</div>
         </MainContent>
       </Container>
     );

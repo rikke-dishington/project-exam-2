@@ -7,6 +7,56 @@ import {
   NoBookingsMessage
 } from './styles';
 
+/**
+ * BookingSection Component
+ * 
+ * A section component that displays a list of bookings, either upcoming or past.
+ * Handles the layout and organization of booking cards with appropriate messaging
+ * when no bookings are present.
+ * 
+ * Features:
+ * - Displays a list of booking cards
+ * - Shows empty state message when no bookings exist
+ * - Handles both upcoming and past bookings
+ * - Provides edit and delete functionality for bookings
+ * - Validates booking data before display
+ * - Responsive grid layout
+ * 
+ * @component
+ * @example
+ * ```jsx
+ * <BookingSection
+ *   title="Upcoming Bookings"
+ *   bookings={[
+ *     {
+ *       id: '123',
+ *       venue: {
+ *         name: 'Beach House',
+ *         media: [{ url: 'image.jpg', alt: 'Beach house' }],
+ *         location: { city: 'Miami', country: 'USA' }
+ *       },
+ *       dateFrom: '2024-02-01',
+ *       dateTo: '2024-02-05',
+ *       guests: 2
+ *     }
+ *   ]}
+ *   isPast={false}
+ *   onEdit={(booking) => handleEdit(booking)}
+ *   onDelete={(booking) => handleDelete(booking)}
+ *   isDeleting={false}
+ *   formatDate={(date) => new Date(date).toLocaleDateString()}
+ * />
+ * ```
+ * 
+ * @param {Object} props - Component props
+ * @param {string} props.title - Section title
+ * @param {Array} props.bookings - Array of booking objects to display
+ * @param {boolean} [props.isPast=false] - Whether this section displays past bookings
+ * @param {Function} props.onEdit - Callback when edit button is clicked
+ * @param {Function} props.onDelete - Callback when delete button is clicked
+ * @param {boolean} props.isDeleting - Whether a delete operation is in progress
+ * @param {Function} props.formatDate - Function to format date strings
+ */
 function BookingSection({ 
   title, 
   bookings = [], 

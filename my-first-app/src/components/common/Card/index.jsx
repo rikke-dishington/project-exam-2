@@ -1,5 +1,52 @@
 import styled, { css } from 'styled-components';
 
+/**
+ * Card Component
+ * 
+ * A flexible card component that provides various styles and layouts for content presentation.
+ * Supports different variants, hover effects, and content organization.
+ * 
+ * Features:
+ * - Multiple variants (outlined, elevated, flat)
+ * - Hover effects
+ * - Media support
+ * - Header and footer sections
+ * - Title and subtitle components
+ * - Responsive design
+ * 
+ * Variants:
+ * - outlined: Border-based card
+ * - elevated: Shadow-based card
+ * - flat: Background color-based card
+ * 
+ * Props (Wrapper):
+ * @param {string} variant - Card style variant ('outlined', 'elevated', 'flat')
+ * @param {boolean} hoverable - Enable hover animation
+ * @param {boolean} clickable - Enable click cursor
+ * 
+ * Props (Media):
+ * @param {string} height - Height of media section
+ * @param {boolean} overlay - Enable gradient overlay
+ * 
+ * Props (Header/Content/Footer):
+ * @param {boolean} compact - Enable compact padding
+ * 
+ * @example
+ * ```jsx
+ * <Card.Wrapper variant="elevated" hoverable>
+ *   <Card.Header>
+ *     <Card.Title>Card Title</Card.Title>
+ *     <Card.Subtitle>Card Subtitle</Card.Subtitle>
+ *   </Card.Header>
+ *   <Card.Media height="200px">
+ *     <img src="image.jpg" alt="Card media" />
+ *   </Card.Media>
+ *   <Card.Content>Content here</Card.Content>
+ *   <Card.Footer>Footer content</Card.Footer>
+ * </Card.Wrapper>
+ * ```
+ */
+
 const CardWrapper = styled.div`
   background: ${({ theme }) => theme.colors.background.paper};
   border-radius: ${({ theme }) => theme.borderRadius.lg};

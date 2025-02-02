@@ -8,6 +8,44 @@ import {
   ErrorMessage
 } from './styles';
 
+/**
+ * Calendar Component
+ * 
+ * A date range picker component specifically designed for venue booking.
+ * Handles date selection, booking availability, and date range validation.
+ * 
+ * Features:
+ * - Date range selection
+ * - Booking availability check
+ * - Disabled dates handling
+ * - Error state display
+ * - Visual date picker
+ * - Two-month display
+ * 
+ * Props:
+ * @param {Object} venue - Venue object containing booking information
+ * @param {Function} onDateSelect - Callback function for date selection (start, end)
+ * @param {Array} disabledDates - Array of dates to disable in the calendar
+ * @param {string} error - Error message to display
+ * @param {string|Date} startDate - Initial start date
+ * @param {string|Date} endDate - Initial end date
+ * 
+ * State:
+ * - selectedDates: Object containing selected start and end dates
+ * - Automatically updates when props change
+ * - Handles date range validation
+ * 
+ * @example
+ * ```jsx
+ * <Calendar
+ *   venue={venueData}
+ *   onDateSelect={(start, end) => handleDateSelection(start, end)}
+ *   error={bookingError}
+ *   startDate={bookingStart}
+ *   endDate={bookingEnd}
+ * />
+ * ```
+ */
 function Calendar({ 
   venue,
   onDateSelect,
@@ -30,6 +68,11 @@ function Calendar({
     }
   }, [startDate, endDate]);
 
+  /**
+   * Handles date range selection
+   * Updates local state and calls parent callback
+   * @param {Array} dates - Array containing [startDate, endDate]
+   */
   const handleDateChange = (dates) => {
     const [start, end] = dates;
     setSelectedDates({ start, end });
@@ -38,7 +81,12 @@ function Calendar({
     }
   };
 
-  // Generate all dates between two dates
+  /**
+   * Generates array of dates between two dates
+   * @param {Date} startDate - Start date
+   * @param {Date} endDate - End date
+   * @returns {Array} Array of dates
+   */
   const getDatesBetween = (startDate, endDate) => {
     const dates = [];
     let currentDate = new Date(startDate);
@@ -51,7 +99,10 @@ function Calendar({
     return dates;
   };
 
-  // Get all booked dates from venue bookings
+  /**
+   * Gets all booked dates from venue bookings
+   * @returns {Array} Array of booked dates
+   */
   const getAllBookedDates = () => {
     if (!venue.bookings || !Array.isArray(venue.bookings)) return [];
 

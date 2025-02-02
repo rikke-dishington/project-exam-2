@@ -3,8 +3,51 @@ import { useNavigate } from 'react-router-dom';
 import { profilesApi } from '../features/profile/api/profiles';
 import { initializeApiKey } from '../api/config';
 
+/**
+ * Context for managing user authentication and profile state throughout the application.
+ * @type {React.Context}
+ */
 const UserContext = createContext();
 
+/**
+ * UserProvider Component
+ * 
+ * Provides global user authentication and profile management functionality.
+ * Handles user authentication state, profile data, and related operations.
+ * 
+ * Features:
+ * - User authentication state management
+ * - Profile data management
+ * - Token management
+ * - API key initialization
+ * - Automatic profile synchronization
+ * - Persistent state through localStorage
+ * - Error handling and retry mechanisms
+ * 
+ * State Management:
+ * - User data with profile information
+ * - Authentication status
+ * - Venue manager status
+ * - Initialization status
+ * - Error state
+ * 
+ * @component
+ * @param {Object} props - Component props
+ * @param {React.ReactNode} props.children - Child components to be wrapped
+ * 
+ * @example
+ * ```jsx
+ * function App() {
+ *   return (
+ *     <UserProvider>
+ *       <Router>
+ *         <AppContent />
+ *       </Router>
+ *     </UserProvider>
+ *   );
+ * }
+ * ```
+ */
 export function UserProvider({ children }) {
   const [isInitialized, setIsInitialized] = useState(false);
   const [error, setError] = useState(null);
@@ -18,6 +61,11 @@ export function UserProvider({ children }) {
   });
   const navigate = useNavigate();
 
+  /**
+   * Fetches user profile data from the API
+   * @param {string} username - Username to fetch profile for
+   * @returns {Promise<Object|null>} Profile data or null if fetch fails
+   */
   const fetchUserProfile = async (username) => {
     try {
       const response = await profilesApi.getProfile(username);
@@ -29,6 +77,12 @@ export function UserProvider({ children }) {
     }
   };
 
+  /**
+   * Updates user data and handles token/profile synchronization
+   * @param {Object} userData - User data to update
+   * @param {string} userData.accessToken - Authentication token
+   * @param {string} userData.name - Username
+   */
   const updateUser = useCallback(async (userData) => {
     if (userData) {
       try {
@@ -76,6 +130,9 @@ export function UserProvider({ children }) {
     }
   }, []);
 
+  /**
+   * Clears all user-related data from state and storage
+   */
   const clearUser = useCallback(() => {
     setUser(null);
     localStorage.removeItem('user');
@@ -83,11 +140,20 @@ export function UserProvider({ children }) {
     localStorage.removeItem('noroff_api_key');
   }, []);
 
+  /**
+   * Logs out the user and redirects to login page
+   */
   const logout = useCallback(() => {
     clearUser();
     navigate('/login');
   }, [navigate, clearUser]);
 
+  /**
+   * Updates user profile data
+   * @param {Object} data - Profile data to update
+   * @returns {Promise<Object>} Updated profile data
+   * @throws {Error} If update fails
+   */
   const updateProfile = async (data) => {
     try {
       const updatedProfile = await profilesApi.updateProfile(user.name, data);
@@ -201,6 +267,30 @@ export function UserProvider({ children }) {
   );
 }
 
+/**
+ * Custom hook for accessing user context
+ * 
+ * Provides access to user authentication state and related functions.
+ * 
+ * @returns {Object} User context value
+ * @property {Object|null} user - Current user data
+ * @property {Function} updateUser - Function to update user data
+ * @property {Function} clearUser - Function to clear user data
+ * @property {Function} logout - Function to log out user
+ * @property {boolean} isLoggedIn - Whether user is logged in
+ * @property {boolean} isVenueManager - Whether user is a venue manager
+ * @property {Function} updateProfile - Function to update user profile
+ * 
+ * @throws {Error} If used outside of UserProvider
+ * 
+ * @example
+ * ```jsx
+ * function UserProfile() {
+ *   const { user, updateProfile } = useUser();
+ *   return <div>Welcome, {user.name}!</div>;
+ * }
+ * ```
+ */
 export function useUser() {
   const context = useContext(UserContext);
   if (!context) {
@@ -209,7 +299,29 @@ export function useUser() {
   return context;
 }
 
-// Optional: Protected Route Component
+/**
+ * Protected Route Component
+ * 
+ * Higher-order component that protects routes based on authentication
+ * and optionally venue manager status.
+ * 
+ * @component
+ * @param {Object} props - Component props
+ * @param {React.ReactNode} props.children - Child components to protect
+ * @param {boolean} [props.requireManager=false] - Whether to require venue manager status
+ * 
+ * @example
+ * ```jsx
+ * <Route
+ *   path="/manage-venues"
+ *   element={
+ *     <RequireAuth requireManager>
+ *       <ManageVenues />
+ *     </RequireAuth>
+ *   }
+ * />
+ * ```
+ */
 export function RequireAuth({ children, requireManager = false }) {
   const { isLoggedIn, isVenueManager } = useUser();
   const navigate = useNavigate();

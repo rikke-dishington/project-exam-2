@@ -1,5 +1,45 @@
 import styled, { css } from 'styled-components';
 
+/**
+ * Input Component
+ * 
+ * A flexible input component with support for various styles, states, and feedback.
+ * Provides a consistent interface for text input across the application.
+ * 
+ * Features:
+ * - Multiple variants (outlined, filled)
+ * - Different sizes (small, medium, large)
+ * - Error state handling
+ * - Helper text support
+ * - Label support
+ * - Full width option
+ * - Rounded corners option
+ * - Disabled state
+ * 
+ * Props:
+ * @param {string} label - Input label text
+ * @param {string} error - Error message to display
+ * @param {string} helperText - Helper text to display below input
+ * @param {boolean} fullWidth - Whether input should take full width
+ * @param {string} variant - Input style variant ('outlined', 'filled')
+ * @param {string} size - Input size ('small', 'medium', 'large')
+ * @param {boolean} rounded - Whether to use fully rounded corners
+ * @param {boolean} disabled - Whether input is disabled
+ * 
+ * @example
+ * ```jsx
+ * <Input
+ *   label="Username"
+ *   helperText="Enter your username"
+ *   error={errors.username}
+ *   value={username}
+ *   onChange={handleChange}
+ *   fullWidth
+ *   size="medium"
+ * />
+ * ```
+ */
+
 const InputWrapper = styled.div`
   display: flex;
   flex-direction: column;

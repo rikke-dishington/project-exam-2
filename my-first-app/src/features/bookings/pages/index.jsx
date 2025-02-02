@@ -12,6 +12,38 @@ import {
   NoBookingsMessage
 } from './styles';
 
+/**
+ * Bookings Page Component
+ * 
+ * Main page component for displaying and managing a user's bookings.
+ * Separates bookings into upcoming and past sections, provides editing
+ * and cancellation functionality, and handles all booking-related operations.
+ * 
+ * Features:
+ * - Fetches and displays user's bookings
+ * - Separates bookings into upcoming and past
+ * - Provides booking management (edit/cancel)
+ * - Handles loading and error states
+ * - Real-time booking updates
+ * - Responsive layout
+ * - Empty state handling
+ * 
+ * URL Parameters:
+ * - name: Username of the profile to display bookings for
+ * 
+ * State Management:
+ * - Manages booking data with separate upcoming/past arrays
+ * - Handles loading and error states
+ * - Manages modal states for editing and deletion
+ * - Tracks selected booking for operations
+ * 
+ * @component
+ * @example
+ * ```jsx
+ * // In your router configuration
+ * <Route path="/profiles/:name/bookings" element={<Bookings />} />
+ * ```
+ */
 function Bookings() {
   const { name } = useParams();
   const [bookings, setBookings] = useState({ upcoming: [], past: [] });
@@ -22,6 +54,13 @@ function Bookings() {
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  /**
+   * Processes raw booking data to ensure consistent format
+   * Handles missing data and converts types where needed
+   * 
+   * @param {Object} booking - Raw booking data from API
+   * @returns {Object} Processed booking data with consistent format
+   */
   const processBookingData = (booking) => {
     if (!booking.id) {
       console.error('Missing booking ID:', booking);
@@ -41,6 +80,11 @@ function Bookings() {
     };
   };
 
+  /**
+   * Fetches and processes bookings data
+   * Separates bookings into upcoming and past based on dates
+   * Updates state with processed data
+   */
   useEffect(() => {
     const fetchBookings = async () => {
       try {
@@ -74,6 +118,12 @@ function Bookings() {
     fetchBookings();
   }, [name]);
 
+  /**
+   * Formats a date string into a readable format
+   * 
+   * @param {string} dateString - ISO date string
+   * @returns {string} Formatted date (e.g., "Mon, Jan 1, 2024")
+   */
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       weekday: 'short',
@@ -83,16 +133,34 @@ function Bookings() {
     });
   };
 
+  /**
+   * Handles initiating the edit process for a booking
+   * Opens the edit modal with the selected booking
+   * 
+   * @param {Object} booking - The booking to edit
+   */
   const handleEdit = (booking) => {
     setSelectedBooking(booking);
     setIsEditModalOpen(true);
   };
 
+  /**
+   * Handles initiating the delete process for a booking
+   * Opens the delete confirmation modal
+   * 
+   * @param {Object} booking - The booking to delete
+   */
   const handleDelete = (booking) => {
     setSelectedBooking(booking);
     setIsDeleteModalOpen(true);
   };
 
+  /**
+   * Handles the confirmation of booking deletion
+   * Processes the deletion and updates the booking list
+   * 
+   * @param {string} bookingId - ID of the booking to delete
+   */
   const handleConfirmDelete = async (bookingId) => {
     setIsDeleting(true);
     try {
@@ -125,6 +193,10 @@ function Bookings() {
     }
   };
 
+  /**
+   * Updates the bookings list after a successful edit
+   * Refetches and reprocesses all bookings
+   */
   const handleUpdate = async () => {
     const response = await profilesApi.getBookings(name);
     const bookingsData = Array.isArray(response) ? response : response.data;
