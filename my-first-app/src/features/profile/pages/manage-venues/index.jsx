@@ -200,7 +200,7 @@ function ManageVenues() {
         <VenueFormModal
           venue={selectedVenue}
           onClose={() => setIsModalOpen(false)}
-          onSave={handleSaveVenue}
+          onSubmit={handleSaveVenue}
         />
       )}
 
