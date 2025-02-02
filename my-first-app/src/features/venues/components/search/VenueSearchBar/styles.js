@@ -18,14 +18,20 @@ export const SearchInput = styled.input`
   width: 100%;
   padding: 1rem;
   padding-right: 2.5rem;
-  border: 2px solid ${({ theme }) => theme.colors.border};
+  border: none;
   border-radius: 8px;
   font-size: 1rem;
   outline: none;
-  transition: border-color 0.2s ease;
+  background: white;
+  color: ${({ theme }) => theme.colors.text.primary};
+  transition: background-color 0.2s ease;
+
+  &::placeholder {
+    color: ${({ theme }) => theme.colors.text.secondary};
+  }
 
   &:focus {
-    border-color: ${({ theme }) => theme.colors.primary.main};
+    box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.primary.main}20;
   }
 `;
 
@@ -46,19 +52,19 @@ export const ClearButton = styled.button`
 
 export const SearchButton = styled.button`
   padding: 0 1.5rem;
-  background: ${({ theme }) => theme.colors.primary.main};
-  color: white;
+  background: white;
+  color: ${({ theme }) => theme.colors.text.primary};
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
 
   &:hover {
-    background: ${({ theme }) => theme.colors.primary.dark};
+    background: ${({ theme }) => theme.colors.background.secondary};
   }
 
   &:disabled {
-    background: ${({ theme }) => theme.colors.border};
+    opacity: 0.5;
     cursor: not-allowed;
   }
 `; 

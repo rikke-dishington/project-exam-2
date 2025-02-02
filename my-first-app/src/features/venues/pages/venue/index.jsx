@@ -85,9 +85,7 @@ function Venue() {
           <Section>
             <SectionTitle>Location</SectionTitle>
             <AddressInfo>
-              <p>{location.address}</p>
-              <p>{location.city}, {location.zip}</p>
-              <p>{location.country}</p>
+              <p>{location.address}, {location.city}, {location.zip}, {location.country}</p>
             </AddressInfo>
           </Section>
 

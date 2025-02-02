@@ -65,7 +65,7 @@ function BookingCard({ booking, onEdit, onDelete, isDeleting, formatDate }) {
                 <FaEdit /> Edit
               </EditButton>
               <DeleteButton 
-                onClick={() => onDelete(booking.id)}
+                onClick={() => onDelete(booking)}
                 disabled={isDeleting}
               >
                 <FaTrash /> Cancel

@@ -11,9 +11,7 @@ export const SectionTitle = styled.h2`
 `;
 
 export const HostSection = styled.div`
-  padding: 1rem;
-  background: ${({ theme }) => theme.colors.background.secondary};
-  border-radius: 8px;
+  padding: 1rem 0;
 `;
 
 export const HostInfoWrapper = styled.div`
@@ -27,10 +25,11 @@ export const Avatar = styled.div`
   height: 60px;
   border-radius: 50%;
   overflow: hidden;
-  background: ${({ theme }) => theme.colors.background.primary};
+  background: ${({ theme }) => theme.colors.background.secondary};
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 1px solid ${({ theme }) => theme.colors.border};
 
   img {
     width: 100%;

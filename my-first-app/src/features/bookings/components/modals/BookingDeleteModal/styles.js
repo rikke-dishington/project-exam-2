@@ -88,11 +88,11 @@ const Button = styled.button`
 `;
 
 export const CancelButton = styled(Button)`
-  background: ${({ theme }) => theme.colors.background.secondary};
-  color: ${({ theme }) => theme.colors.text.primary};
+  background: ${({ theme }) => theme.colors.success};
+  color: white;
 
   &:hover:not(:disabled) {
-    background: ${({ theme }) => theme.colors.background.primary};
+    background: ${({ theme }) => theme.colors.success}dd;
   }
 `;
 

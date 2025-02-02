@@ -24,8 +24,10 @@ export const LoadingSpinner = styled.div`
 export const ErrorMessage = styled.div`
   padding: 1rem;
   margin: 1rem 0;
-  background: ${({ theme }) => theme.colors.error}20;
-  color: ${({ theme }) => theme.colors.error};
+  background: ${({ $success, theme }) => 
+    $success ? theme.colors.success + '20' : theme.colors.error + '20'};
+  color: ${({ $success, theme }) => 
+    $success ? theme.colors.success : theme.colors.error};
   border-radius: 4px;
   text-align: center;
 `;

@@ -20,17 +20,20 @@ function ManageVenueCard({ venue, onEdit, onDelete, onViewBookings }) {
       <VenueDetails>
         <h3>{venue.name}</h3>
         <p>{venue.location.city}, {venue.location.country}</p>
-        <p className="price">Price per night: ${venue.price}</p>
+        <p className="price">
+          <span className="amount">${venue.price}</span>
+          <span className="label"> per night</span>
+        </p>
       </VenueDetails>
       <ActionButtons>
         <IconButton onClick={() => onViewBookings(venue)} title="View Bookings">
-          <FaCalendar />
+          <FaCalendar /> Bookings
         </IconButton>
         <IconButton onClick={() => onEdit(venue)} title="Edit Venue">
-          <FaEdit />
+          <FaEdit /> Edit
         </IconButton>
         <IconButton onClick={() => onDelete(venue)} title="Delete Venue" $danger>
-          <FaTrash />
+          <FaTrash /> Delete
         </IconButton>
       </ActionButtons>
     </Card>

@@ -15,10 +15,10 @@ export const Modal = styled.div`
 
 export const ModalContent = styled.div`
   background: white;
-  border-radius: 8px;
   padding: 2rem;
-  width: 100%;
-  max-width: 500px;
+  border-radius: 8px;
+  max-width: 800px;
+  width: 90%;
   max-height: 90vh;
   overflow-y: auto;
 `;
@@ -27,10 +27,11 @@ export const Header = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 
   h2 {
     margin: 0;
+    font-size: 1.5rem;
     color: ${({ theme }) => theme.colors.text.primary};
   }
 `;
@@ -42,9 +43,6 @@ export const CloseButton = styled.button`
   cursor: pointer;
   color: ${({ theme }) => theme.colors.text.secondary};
   padding: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 
   &:hover {
     color: ${({ theme }) => theme.colors.text.primary};
@@ -57,92 +55,12 @@ export const Form = styled.form`
   gap: 1.5rem;
 `;
 
-export const InputGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-
-  input {
-    padding: 0.75rem;
-    border: 1px solid ${({ theme }) => theme.colors.border};
-    border-radius: 4px;
-    font-size: 1rem;
-
-    &:focus {
-      outline: none;
-      border-color: ${({ theme }) => theme.colors.primary.main};
-    }
-  }
-`;
-
-export const Label = styled.label`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: ${({ theme }) => theme.colors.text.secondary};
-  font-size: 0.9rem;
-
-  svg {
-    color: ${({ theme }) => theme.colors.primary.main};
-  }
-`;
-
-export const SaveButton = styled.button`
-  width: 100%;
-  padding: 0.75rem;
-  background: ${({ theme }) => theme.colors.primary.main};
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background: ${({ theme }) => theme.colors.primary.dark};
-  }
-
-  &:disabled {
-    background: ${({ theme }) => theme.colors.background.secondary};
-    cursor: not-allowed;
-  }
-`;
-
-export const ErrorMessage = styled.div`
-  color: ${({ theme }) => theme.colors.error};
-  background: ${({ theme }) => theme.colors.error}20;
-  padding: 0.75rem;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  text-align: center;
-`;
-
-export const DatePickerWrapper = styled.div`
-  display: flex;
-  gap: 1rem;
-  
-  .react-datepicker-wrapper {
-    flex: 1;
-  }
-  
-  input {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid ${({ theme }) => theme.colors.border};
-    border-radius: 4px;
-    font-size: 1rem;
-
-    &:focus {
-      outline: none;
-      border-color: ${({ theme }) => theme.colors.primary.main};
-    }
-  }
-`;
-
 export const VenueInfo = styled.div`
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
+  padding: 1rem;
+  background: ${({ theme }) => theme.colors.background.secondary};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
 
   h3 {
     margin: 0 0 1rem 0;
@@ -155,31 +73,61 @@ export const VenueInfo = styled.div`
 
     strong {
       color: ${({ theme }) => theme.colors.text.primary};
+      margin-right: 0.5rem;
     }
+  }
+`;
+
+export const CalendarSection = styled.div`
+  margin-bottom: 1.5rem;
+`;
+
+export const InputGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  input {
+    padding: 0.75rem;
+    border: 1px solid ${({ theme }) => theme.colors.border};
+    border-radius: 8px;
+    font-size: 1rem;
+
+    &:focus {
+      border-color: ${({ theme }) => theme.colors.primary.main};
+      outline: none;
+      box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.primary.main}20;
+    }
+  }
+`;
+
+export const Label = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: ${({ theme }) => theme.colors.text.primary};
+  font-weight: 500;
+
+  svg {
+    color: ${({ theme }) => theme.colors.success};
   }
 `;
 
 export const PriceInfo = styled.div`
   padding: 1rem;
-  background: ${({ theme }) => theme.colors.background.secondary};
+  background: ${({ theme }) => theme.colors.success}15;
+  border: 1px solid ${({ theme }) => theme.colors.success}30;
   border-radius: 8px;
+  margin-top: 1rem;
 
   div {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 0.5rem;
-    color: ${({ theme }) => theme.colors.text.secondary};
+    margin: 0.25rem 0;
+    color: ${({ theme }) => theme.colors.text.primary};
 
-    &:last-child {
-      margin-bottom: 0;
-    }
-
-    &.total {
-      margin-top: 1rem;
-      padding-top: 1rem;
-      border-top: 1px solid ${({ theme }) => theme.colors.border};
-      color: ${({ theme }) => theme.colors.text.primary};
-      font-size: 1.1rem;
+    strong {
+      color: ${({ theme }) => theme.colors.text.secondary};
+      font-weight: normal;
+      margin-right: 0.5rem;
     }
   }
 `;
@@ -190,23 +138,85 @@ export const ButtonGroup = styled.div`
   margin-top: 1rem;
 `;
 
-export const CancelButton = styled.button`
-  flex: 1;
-  padding: 0.75rem;
-  background: ${({ theme }) => theme.colors.error};
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
+export const Button = styled.button`
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
+  flex: 1;
+`;
+
+export const CancelButton = styled(Button)`
+  background: white;
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  color: ${({ theme }) => theme.colors.text.primary};
 
   &:hover {
-    background: ${({ theme }) => theme.colors.error}dd;
+    background: ${({ theme }) => theme.colors.background.secondary};
+  }
+`;
+
+export const SaveButton = styled(Button)`
+  background: ${({ theme }) => theme.colors.primary.main};
+  border: none;
+  color: white;
+
+  &:hover:not(:disabled) {
+    background: ${({ theme }) => theme.colors.primary.main};
+    opacity: 0.9;
   }
 
   &:disabled {
-    background: ${({ theme }) => theme.colors.background.secondary};
+    opacity: 0.7;
     cursor: not-allowed;
+  }
+`;
+
+export const ErrorMessage = styled.div`
+  color: ${({ theme }) => theme.colors.error};
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+`;
+
+export const DatePickerButton = styled.button`
+  width: 100%;
+  padding: 1rem;
+  background: ${({ theme }) => theme.colors.background.secondary};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: ${({ theme }) => theme.colors.text.primary};
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 1rem;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.background.disabled};
+  }
+
+  svg {
+    color: ${({ theme }) => theme.colors.primary.main};
+  }
+`;
+
+export const SelectedDates = styled.div`
+  padding: 1rem;
+  background: ${({ theme }) => theme.colors.success}15;
+  border: 1px solid ${({ theme }) => theme.colors.success}30;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+
+  div {
+    margin: 0.25rem 0;
+    color: ${({ theme }) => theme.colors.text.primary};
+
+    strong {
+      color: ${({ theme }) => theme.colors.text.secondary};
+      font-weight: normal;
+      margin-right: 0.5rem;
+    }
   }
 `; 

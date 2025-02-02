@@ -30,8 +30,8 @@ export const ProfileContent = styled.div`
   .badge {
     display: inline-block;
     padding: 0.5rem 1rem;
-    background: ${({ theme }) => theme.colors.primary.main}20;
-    color: ${({ theme }) => theme.colors.primary.main};
+    background: ${({ theme }) => theme.colors.success}20;
+    color: ${({ theme }) => theme.colors.success};
     border-radius: 20px;
     font-size: 0.9rem;
     font-weight: 500;

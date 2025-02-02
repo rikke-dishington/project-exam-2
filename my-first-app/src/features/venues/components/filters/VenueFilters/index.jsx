@@ -56,7 +56,7 @@ function Filters({ onFilterChange, initialFilters }) {
               onChange={() => handleCheckboxChange('wifi')}
             />
             <CheckboxLabel htmlFor="wifi">
-              <FaWifi /> WiFi
+              <FaWifi className="fa-wifi" /> WiFi
             </CheckboxLabel>
           </FilterOption>
           
@@ -68,7 +68,7 @@ function Filters({ onFilterChange, initialFilters }) {
               onChange={() => handleCheckboxChange('parking')}
             />
             <CheckboxLabel htmlFor="parking">
-              <FaParking /> Parking
+              <FaParking className="fa-parking" /> Parking
             </CheckboxLabel>
           </FilterOption>
           
@@ -80,7 +80,7 @@ function Filters({ onFilterChange, initialFilters }) {
               onChange={() => handleCheckboxChange('breakfast')}
             />
             <CheckboxLabel htmlFor="breakfast">
-              <FaCoffee /> Breakfast
+              <FaCoffee className="fa-coffee" /> Breakfast
             </CheckboxLabel>
           </FilterOption>
           
@@ -92,7 +92,7 @@ function Filters({ onFilterChange, initialFilters }) {
               onChange={() => handleCheckboxChange('pets')}
             />
             <CheckboxLabel htmlFor="pets">
-              <FaPaw /> Pets Allowed
+              <FaPaw className="fa-paw" /> Pets Allowed
             </CheckboxLabel>
           </FilterOption>
         </FilterGroup>

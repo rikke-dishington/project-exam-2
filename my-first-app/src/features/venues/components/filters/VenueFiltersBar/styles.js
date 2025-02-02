@@ -1,7 +1,8 @@
 import styled from 'styled-components';
 
 export const FiltersSection = styled.div`
-  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
 `;
 
 export const ResultsInfo = styled.div`

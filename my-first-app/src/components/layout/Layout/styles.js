@@ -8,4 +8,5 @@ export const LayoutContainer = styled.div`
 
 export const MainContent = styled.main`
   flex: 1;
+  margin-bottom: 50px;
 `; 

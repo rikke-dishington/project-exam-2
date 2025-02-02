@@ -1,28 +1,55 @@
 import styled from 'styled-components';
 
 export const Container = styled.main`
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 2rem;
+  width: 100%;
 `;
 
 export const Header = styled.div`
+  background: linear-gradient(135deg, 
+    ${({ theme }) => theme.colors.primary.main} 0%,
+    ${({ theme }) => theme.colors.primary.dark} 100%
+  );
+  padding: ${({ theme }) => theme.spacing[16]} ${({ theme }) => theme.spacing[4]};
+  margin-bottom: ${({ theme }) => theme.spacing[12]};
+  color: ${({ theme }) => theme.colors.primary.contrast};
+`;
+
+export const HeaderContent = styled.div`
+  max-width: 1400px;
+  margin: 0 auto;
   text-align: center;
-  margin-bottom: 3rem;
 `;
 
 export const Title = styled.h1`
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.text.primary};
-  margin-bottom: 1.5rem;
+  font-size: ${({ theme }) => theme.typography.fontSize['5xl']};
+  font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
+  color: ${({ theme }) => theme.colors.primary.contrast};
+  margin-bottom: ${({ theme }) => theme.spacing[2]};
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+`;
+
+export const Subtitle = styled.p`
+  font-size: ${({ theme }) => theme.typography.fontSize.xl};
+  color: ${({ theme }) => theme.colors.primary.contrast};
+  margin-bottom: ${({ theme }) => theme.spacing[6]};
+  opacity: 0.9;
 `;
 
 export const SearchContainer = styled.form`
   display: flex;
-  max-width: 600px;
+  max-width: 700px;
   margin: 0 auto;
-  gap: 0.5rem;
+  gap: ${({ theme }) => theme.spacing[2]};
+  padding: ${({ theme }) => theme.spacing[2]};
+  background: ${({ theme }) => theme.colors.background.paper};
+  border-radius: ${({ theme }) => theme.borderRadius.lg};
+  box-shadow: ${({ theme }) => theme.shadows.lg};
+`;
+
+export const MainContent = styled.div`
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 ${({ theme }) => theme.spacing[4]};
 `;
 
 export const SearchInputWrapper = styled.div`
@@ -34,16 +61,21 @@ export const SearchInputWrapper = styled.div`
 
 export const SearchInput = styled.input`
   width: 100%;
-  padding: 1rem;
-  padding-right: 2.5rem;
-  border: 2px solid ${({ theme }) => theme.colors.border};
-  border-radius: 8px;
-  font-size: 1rem;
+  padding: ${({ theme }) => theme.spacing[4]};
+  padding-right: ${({ theme }) => theme.spacing[10]};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.borderRadius.base};
+  font-size: ${({ theme }) => theme.typography.fontSize.lg};
   outline: none;
-  transition: border-color 0.2s ease;
+  transition: all ${({ theme }) => theme.transitions.base};
 
   &:focus {
     border-color: ${({ theme }) => theme.colors.primary.main};
+    box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.primary.main}20;
+  }
+
+  &::placeholder {
+    color: ${({ theme }) => theme.colors.text.secondary};
   }
 `;
 
@@ -63,20 +95,22 @@ export const ClearButton = styled.button`
 `;
 
 export const SearchButton = styled.button`
-  padding: 0 1.5rem;
+  padding: ${({ theme }) => `${theme.spacing[4]} ${theme.spacing[6]}`};
   background: ${({ theme }) => theme.colors.primary.main};
-  color: white;
+  color: ${({ theme }) => theme.colors.primary.contrast};
   border: none;
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.borderRadius.base};
+  font-size: ${({ theme }) => theme.typography.fontSize.base};
+  font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background-color ${({ theme }) => theme.transitions.base};
 
   &:hover {
     background: ${({ theme }) => theme.colors.primary.dark};
   }
 
   &:disabled {
-    background: ${({ theme }) => theme.colors.border};
+    background: ${({ theme }) => theme.colors.background.disabled};
     cursor: not-allowed;
   }
 `;
@@ -128,6 +162,18 @@ export const ControlsBar = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+`;
+
+export const SectionTitle = styled.h2`
+  font-size: ${({ theme }) => theme.typography.fontSize['2xl']};
+  font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
+  color: ${({ theme }) => theme.colors.text.primary};
+`;
+
+export const Controls = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing[4]};
 `;
 
 const BaseButton = styled.button`
