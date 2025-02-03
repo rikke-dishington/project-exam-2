@@ -21,8 +21,8 @@ Holidaze is a venue booking platform that connects property owners with potentia
  ## Delivery
 
 ### Links
-* [GitHub - Repository link](https://github.com/rikke-dishington/project-exam-2)
-* [Netlify - Hosted application demo link](stupendous-bienenstitch-f24aa0.netlify.app)
+* GitHub - Repository link - https://github.com/rikke-dishington/project-exam-2
+* Netlify - Hosted application demo link - stupendous-bienenstitch-f24aa0.netlify.app
 
 ## Features
 
