@@ -1,4 +1,5 @@
 # Project Exam 2 - Holidaze
+<img width="1325" alt="Screenshot" src="https://github.com/rikke-dishington/project-exam-2/blob/main/Screenshot%202025-03-02%20at%2010.19.04.png">
 
 ## Brief
 The API used for this brief is: https://v2.api.noroff.dev/holidaze
