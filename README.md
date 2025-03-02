@@ -7,7 +7,6 @@ Holidaze is a venue booking platform that connects property owners with potentia
 
 ## Table of Contents
 * [Delivery](#delivery)
-* [Links](#links)
 * [Features](#features)
 * [Technical stack](#technical_stack)
 * [Project structure](#project_structure)
